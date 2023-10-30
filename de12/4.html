@@ -8,12 +8,102 @@
     <!-- h1.htmlからある行をコピペしてくればOK -->
 </head>
 <body>
-    <h1>道用先生から単位を貰おう！</h1>
+    <h1>道用先生から単位を貰うゲームを作りたかった</h1>
     <div>
       <h2>何をつくるか</h2>
       道用先生から単位を貰う選択ゲームを作ることにしました。
    
     </div>
+
+    <div>
+      <h2>構想メモ</h2>
+     <p>あなたはX Business Program に参加したい一年生です。<br>
+      でもどうしてか、参加するために必要な『デザイン経営論』の課題をぜんぜん出していませんでした。<br>
+      最後の課題である「最終課題」で挽回し、単位を貰いましょう！<br>
+     </p>
+
+
+    <p>
+      はい　or　いいえ<br>
+    </p>
+
+
+   <p>【いいえ】<br>
+    単位を貰いましょう！(ループ) <br>
+   </p>
+   <p>
+    はい　or　いいえ<br>
+   </p>
+
+   <p>【はい】<br>
+   「最終課題」の内容は“世の中に無さそうな物をつくって発表する”というものです。<br>
+     何を作りますか？自分の答えを数字で打ち込んでください。<br>
+    １．	見たこともない天才的なもの　２．見たことのある投げやりのもの<br>
+   </p>
+
+   <p>
+   【１の場合】<br> 
+    あなたはそのほかの教養単位を落とすことになったが無事単位を貰うことができた。<br>
+    これから始まるX Business Programに期待を膨らまそう！<br>
+   </p>
+
+   <p>
+    【２の場合】<br>
+   担当の道用先生から心配のメールが来たが、ギリギリ単位を貰うことが出来た。<br>
+   これからはしっかりと課題を出すよう気をつけて、X Business Programに参加しよう。<br>
+   </p>
+
+      
+  </div>
+
+  <div>
+    <h2>ソースコード</h2>
+    <code>
+      <ol style="list-style:decimal-leading-zero outside;in-left:0;padding-left:36px;margin:0;background-color:#EEF;color:#000;">
+      <li style="background-color:#EFF;">print("あなたは「X Business Program」 に参加したい一年生です。")</li>
+      <li style="background-color:#EEF;">print("でもどうしてか、参加するために必要な『デザイン経営論』の課題をぜんぜん提出していませんでした")</li>
+      <li style="background-color:#EFF;">print("最後の課題である「最終課題」で挽回し、単位を貰いましょう！")</li>
+      <li style="background-color:#EEF;"></li>
+      <li style="background-color:#EFF;">name = int(input('1,はい　2,いいえ\n'))</li>
+      <li style="background-color:#EEF;">#質問の繰り返し方が全くわからない</li>
+      <li style="background-color:#EFF;">if name == 1 :</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("最終課題の内容は「世の中に無さそうな物を作って発表する」というものです")</li>
+      <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("どんなものを作りますか？")</li>
+      <li style="background-color:#EEF;"></li>
+      <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;second = int(input('1,見たこともない天才的なもの　2,調べたら出てくる投げやりのもの\n'))</li>
+      <li style="background-color:#EEF;"></li>
+      <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if second == 1:</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("あなたはそのほかの単位を全て落とすことになったが無事デザイン経営論の単位を貰うことが出来た")</li>
+      <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("これから始まるX business Programに期待しよう！")</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;elif second == 2:</li>
+      <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("担当の道用先生から心配のメールが来たが、どうにか単位を貰うことが出来た")</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("これからはしっかりと課題を出すように気を付けてX Business Programに参加しよう！")</li>
+      <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;else:</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("MMキャンパス14階 14011室にいる道用先生に土下座して謝りましょう。")</li>
+      <li style="background-color:#EFF;"></li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</li>
+      <li style="background-color:#EFF;">elif name == 2:</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("残念です。。")</li>
+      <li style="background-color:#EFF;">else:</li>
+      <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("1か2で答えてください")</li>
+      <li style="background-color:#EFF;"></li>
+      </ol></code>
+  </div>
+
+  <div>
+    <h2>疑問点・感想</h2>
+    <p>質問の回答に対して、さらに質問するためのコードがよくわからなかった。<br>
+    こういったゲームは自分の答えに対して相手の回答やストーリーが変わることこそ醍醐味だと思うが、どう展開を分岐させて良いかわからず深みのあるゲームを作ることが出来なかったことが悔やまれる。<br>
+    </p>
+    <p>
+      先輩方のを見ていたら、質問の後に「/n」という記号を入れていることに気づいた。これがあることによって質問文が表記した際に改行してくれるため見やすくなった。<br>
+    </p>
+
+
+
+  </div>
+
+    
 
 
     
