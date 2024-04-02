@@ -1,0 +1,34 @@
+@charset "UTF-8";
+body {
+    background-color: #dddddd;
+    background-image: url(../images/YUKA.jpg);
+    background-repeat: repeat;
+    background-position: 40px 80px;
+}
+html {
+    font-size: 100%;
+}
+h1 {
+    background-color: plum; color: rgba(10, 130, 165, .5); font-family: "游ゴシック体", "Yu Gothic", Yugothic, sans-serif;
+    margin: 30px;
+    padding: 40px;
+    
+}
+div{
+    background-color: aliceblue;
+    margin: 30px; 
+    padding: 20px;
+    border-width: 1px 1px 12px 12px ;
+    border-style: double;
+    border-color: tomato;
+}
+p {
+    background-color: burlywood;
+    font-size: 20px; line-height: 1.7; text-align: center;
+}
+ul {
+  font-size: 18px ;
+  list-style-image: url(../images/0_XBlogo.png);
+
+    
+}
