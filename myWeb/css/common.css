@@ -1,0 +1,31 @@
+@charset "UTF=8";
+body {
+    background-color: #ffffff;
+    color: #008000;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: 14px;
+}
+.header {
+    background-color: #ffffff;
+    color: #009000;
+    font-size: 28px;
+}
+.left-navi {
+    background-color: #000000;
+    color: #ffffff;
+    width: 25%;
+    height: 740px;
+    float: left;
+}
+.main-contents {
+    background-color: #ff0000;
+    width: 75%;
+    height: 740px;
+    float: right;
+}
+.footer {
+background-color: #aaaaaa;
+height:50px;
+clear: both; 
+}

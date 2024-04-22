@@ -129,6 +129,7 @@ aside {
     order: 3;
 }   
 .ad {
+    padding-right: 20px;
     order: 1;
 }
 .news-contents {
