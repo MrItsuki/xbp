@@ -36,8 +36,71 @@
                     <p class="post-date">5/13 <span>2024</span></p>
                     <p class="post-cat">カテゴリー：課題</p>
                 </header>
-                
-                
+                <p>今回はNeoPixelとステッピングモーターを制御して簡易的なスロットを作りました。</p>
+                <h3 class="sub-title">制作過程</h3>
+                <h4 class="subsub-title">スロット</h4>
+                <p>モーター三つに対し、特定のキーを送ることで回転が止まり、10秒後にまた自動で回りだすプログラムを組んだ。</p>
+                <h4 class="subsub-title">装飾</h4>
+                <p>dfLinkを使用し、スロットがそろったらスタッフが信号を送信し、光方のパターンを変更させるプログラムを組んだ。</p>
+                <code>
+                    <ol style="list-style:decimal-leading-zero outside;in-left:0;padding-left:36px;margin:0;background-color:#EEF;color:#000;">
+                    <li style="background-color:#EFF;">#include &lt;Adafruit_NeoPixel.h&gt;</li>
+                    <li style="background-color:#EEF;"></li>
+                    <li style="background-color:#EFF;">#define PIN        9        // 信号用のピンを指定</li>
+                    <li style="background-color:#EEF;">#define NUMPIXELS  5        // LEDの数を指定</li>
+                    <li style="background-color:#EFF;">int brightness = 50;        // 明るさ</li>
+                    <li style="background-color:#EEF;">int flashInterval = 50;    // 点滅間隔（ミリ秒）</li>
+                    <li style="background-color:#EFF;">int val=0;</li>
+                    <li style="background-color:#EEF;">int from_pc="0";</li>
+                    <li style="background-color:#EFF;"></li>
+                    <li style="background-color:#EEF;">Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);</li>
+                    <li style="background-color:#EFF;"></li>
+                    <li style="background-color:#EEF;">void setup() {</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;pixels.begin();          // NeoPixel出力ピンの初期化</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;pixels.setBrightness(brightness);</li>
+                    <li style="background-color:#EFF;">}</li>
+                    <li style="background-color:#EEF;"></li>
+                    <li style="background-color:#EFF;">void loop()</li>
+                    <li style="background-color:#EEF;">&nbsp;{</li>
+                    <li style="background-color:#EFF;"></li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;if(Serial.available() &gt; 0){</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;from_pc = Serial.read();</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;}</li>
+                    <li style="background-color:#EFF;"></li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;//１をON、0をOFFと考える</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;//１が送られてきたらLEDを点灯、0だったら消灯</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;if (from_pc=='1')</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;pixels.clear();          // すべてのLEDの色を0にセット</li>
+                    <li style="background-color:#EEF;"></li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;// 赤色を設定</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;uint32_t redColor = pixels.Color(255, 0, 0);</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;// LEDを点滅させる</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;for(int i = 0; i &lt; NUMPIXELS; i++) {</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;pixels.setPixelColor(i, redColor);</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;}</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;pixels.show();  // 色を表示</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;// 点滅間隔分待つ</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;delay(flashInterval);</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;// LEDを消す</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;pixels.clear();</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;pixels.show();  // 色を表示</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;</li>
+                    <li style="background-color:#EFF;">&nbsp;&nbsp;// 点滅間隔分待つ</li>
+                    <li style="background-color:#EEF;">&nbsp;&nbsp;delay(flashInterval);</li>
+                    <li style="background-color:#EFF;">}</li>
+                    <li style="background-color:#EEF;"></li>
+                    </ol>
+                </code>
+                <h3 class="sub-title">感想</h3>
+                短時間にしてはそれらしきものが出来たので良かったが、理想としてはスロットの当たり外れを機械が認識して、演出を変えるプログラムを作りたかったのでまだまだである。
+                また、今回私はNeoPixelのプログラムを主に担当したが、chatGPTに頼って意味が分からなくなったので今後はしっかりと理解を大切にして行いたいと思う。
+
+
+
+        
              
             </article>
             <aside>
@@ -54,7 +117,7 @@
                 
             </aside>
             <div class="ad">
-                <iframe width="422" height="751" src="https://www.youtube.com/embed/dDGypw_hikk" title="IoT 最高の瞬間" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                <iframe width="300" height="534" src="https://www.youtube.com/embed/dDGypw_hikk" title="IoT 最高の瞬間" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
           
 
