@@ -31,6 +31,7 @@
 
         <div class="news-contents wrapper">
             <article>
+                <!---５月27日のやつ-->
                 <header class="post-info">
                     <h2 class="post-title">プロトタイピング①</h2>
                     <p class="post-date">5/27<span>2024</span></p>
@@ -49,6 +50,8 @@
                 <img src="./images/Sample_first.jpg" alt="スケッチ">
                 <p>現状考えている案は感圧センサーを使い、ケースにスマホを入れていた時間によって背面ライトの光が増していき、視覚的に自分がどれほど我慢したのかわかるようにしようとしています。</p>
                 <img src="./images/Kikaku1.jpg" alt="企画１">
+
+                <!--６月３日のやつ-->
 
                 <header class="post-info">
                     <h2 class="post-title">プロトタイピング②</h2>
@@ -70,6 +73,127 @@
                 <p>
                     参考にしたサイトは<a href="https://toccho.net/2021/10/31/arduino-pressure/">こちら</a>です
                 </p>
+
+                <!--６月１０日のやつ-->
+
+                <header class="post-info">
+                    <h2 class="post-title">プロトタイピング③</h2>
+                    <p class="post-date">6/10<span>2024</span></p>
+                    <p class="post-cat">カテゴリー：課題</p>
+                   
+                </header>
+                <h3 class="sub-title">プロトタイプするぞ</h3>
+                    <p>まず初めに、スマホを入れるための箱を作りました。
+                        毎度のごとく、<a href="https://www.makercase.com/#/">MakerCase</a>を使用してデータを作成。<br>
+                        そのデータに充電コード用の穴などをつけています。
+                        <img src="./images/Protype_Box1.jpg" width="70%" alt="Protype_Box1">
+                    </p>
+
+                    <p>
+                    <img src="./images/GtyaGtya1.jpg" width="70%">
+                    </p>
+
+                <!--６月１７日のやつ-->
+
+                <header class="post-info">
+                    <h2 class="post-title">プロトタイピング④</h2>
+                    <p class="post-date">6/17<span>2024</span></p>
+                    <p class="post-cat">カテゴリー：課題</p>
+                   
+                </header>
+                <h3 class="sub-title">時間で光り方が変わるコード</h3>
+                    <p>
+                        先週、プロトタイプの箱が出来たので次は圧力を感知した時間によってＬＥＤテープが光り方が変えられるコードを考えました。<br>
+                        完成形のイメージとしては、徐々に光が強くなり、スマホを触っていない時間が「感覚的」にわかるようにしたいのですが
+                        とりあえず一定時間ごとに光が増えるようにコードを製作しました。
+                    
+                    </p>
+
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/VCr87LnzkB0?si=sMxPD8r0sO4QEt5S" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
+                    <p>
+                        下記のコードは動画のものに、少し改良を加えたものです。
+                    </p>
+
+                    <code>
+                        <ol style="list-style:decimal-leading-zero outside;in-left:0;padding-left:36px;margin:0;background-color:#EEF;color:#000;">
+                        <li style="background-color:#EFF;">&nbsp;#include &lt;Adafruit_NeoPixel.h&gt; </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">// NeoPixelの設定 </li>
+                        <li style="background-color:#EEF;">#define NUM_PIXELS 5 </li>
+                        <li style="background-color:#EFF;">#define PIN_PIXELS 6 </li>
+                        <li style="background-color:#EEF;">Adafruit_NeoPixel pixels(NUM_PIXELS, PIN_PIXELS, NEO_GRB + NEO_KHZ800); </li>
+                        <li style="background-color:#EFF;"></li>
+                        <li style="background-color:#EEF;">// 圧力センサーのピン設定 </li>
+                        <li style="background-color:#EFF;">#define PRESSURE_SENSOR_PIN A0 </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">// LEDの色設定 </li>
+                        <li style="background-color:#EEF;">#define LED_COLOR_R 255, 0, 0 </li>
+                        <li style="background-color:#EFF;">#define LED_COLOR_Y 255, 255, 0 </li>
+                        <li style="background-color:#EEF;">#define LED_COLOR_O 255, 69, 0 </li>
+                        <li style="background-color:#EFF;">#define LED_COLOR_W 255, 255, 255 </li>
+                        <li style="background-color:#EEF;">#define LED_COLOR_B 0, 0, 255 </li>
+                        <li style="background-color:#EFF;"></li>
+                        <li style="background-color:#EEF;">// 初期LEDの数 </li>
+                        <li style="background-color:#EFF;">int numLEDs = 0; // 最初はLEDはすべて消灯状態 </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">void setup() { </li>
+                        <li style="background-color:#EEF;">pixels.begin(); // NeoPixelの初期化 </li>
+                        <li style="background-color:#EFF;">Serial.begin(9600); // シリアル通信の開始（デバッグ用） </li>
+                        <li style="background-color:#EEF;">} </li>
+                        <li style="background-color:#EFF;"></li>
+                        <li style="background-color:#EEF;">void loop() { </li>
+                        <li style="background-color:#EFF;">// 圧力センサーの値を読み込む </li>
+                        <li style="background-color:#EEF;">int sensorValue = analogRead(PRESSURE_SENSOR_PIN); </li>
+                        <li style="background-color:#EFF;"></li>
+                        <li style="background-color:#EEF;">if (sensorValue &lt; 200) { // 圧力センサーの閾値（例: 200） </li>
+                        <li style="background-color:#EFF;">// 圧力がかかっている場合 </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">// LEDを点灯させる </li>
+                        <li style="background-color:#EEF;">for (int i = 0; i &lt; numLEDs; i++) { </li>
+                        <li style="background-color:#EFF;">switch(i) { </li>
+                        <li style="background-color:#EEF;">case 0: </li>
+                        <li style="background-color:#EFF;">pixels.setPixelColor(i, pixels.Color(LED_COLOR_B)); </li>
+                        <li style="background-color:#EEF;">break; </li>
+                        <li style="background-color:#EFF;">case 1: </li>
+                        <li style="background-color:#EEF;">pixels.setPixelColor(i, pixels.Color(LED_COLOR_W)); </li>
+                        <li style="background-color:#EFF;">break; </li>
+                        <li style="background-color:#EEF;">case 2: </li>
+                        <li style="background-color:#EFF;">pixels.setPixelColor(i, pixels.Color(LED_COLOR_Y)); </li>
+                        <li style="background-color:#EEF;">break; </li>
+                        <li style="background-color:#EFF;">case 3: </li>
+                        <li style="background-color:#EEF;">pixels.setPixelColor(i, pixels.Color(LED_COLOR_O)); </li>
+                        <li style="background-color:#EFF;">break; </li>
+                        <li style="background-color:#EEF;">case 4: </li>
+                        <li style="background-color:#EFF;">pixels.setPixelColor(i, pixels.Color(LED_COLOR_R)); </li>
+                        <li style="background-color:#EEF;">break; </li>
+                        <li style="background-color:#EFF;">} </li>
+                        <li style="background-color:#EEF;">} </li>
+                        <li style="background-color:#EFF;">pixels.show(); // LEDに色を表示 </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">// 5秒待つ </li>
+                        <li style="background-color:#EEF;">delay(5000); </li>
+                        <li style="background-color:#EFF;"></li>
+                        <li style="background-color:#EEF;">// LEDの数を増やす（最大NUM_PIXELSまで） </li>
+                        <li style="background-color:#EFF;">if (numLEDs &lt; NUM_PIXELS) { </li>
+                        <li style="background-color:#EEF;">numLEDs++; </li>
+                        <li style="background-color:#EFF;">} </li>
+                        <li style="background-color:#EEF;">} else { </li>
+                        <li style="background-color:#EFF;">// 圧力がかかっていない場合、すぐにLEDを消灯させる </li>
+                        <li style="background-color:#EEF;">pixels.clear(); // すべてのLEDを消灯 </li>
+                        <li style="background-color:#EFF;">pixels.show(); // LEDに反映 </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">// LEDの数を初期化 </li>
+                        <li style="background-color:#EEF;">numLEDs = 0; </li>
+                        <li style="background-color:#EFF;">} </li>
+                        <li style="background-color:#EEF;"></li>
+                        <li style="background-color:#EFF;">delay(100); // 少し待つ</li>
+                        <li style="background-color:#EEF;">｝</li>
+                        </ol></code>
+
+
+
+
 
 
                 
