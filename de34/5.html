@@ -199,11 +199,133 @@
                     </header>
                     <h3 class="sub-title">置けば置くほど光る箱</h3>
                     <p>
-                        私たち
+                        私たちは、徐々に光が増えていき、１時間を視覚的にわかるように、dfLinkでグラフとしても可視化出来るようにプログラムを組みました。<br>
+                        前回のレポートでは出来ていなかった徐々光量が増えて、視覚的に時間がわかるプログラムも完成しています。<br>
+                        
+
                     </p>
                     <iframe width="896" height="504" src="https://www.youtube.com/embed/GXwdkH80agg?si=CpjUE0Pp1OGpOjCQ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen>
 
                     </iframe>
+                    <h3 class="sub-title">
+                        概要
+                    </h3>
+                    <p>
+                        下記のソースコードで徐々に光らせるプログラムは出来るのですが、授業で使ったコードでdfLinkにつなげようとするとうまくいきません。<br>
+                        pyファイルのコードには、圧力センサーが圧力数値を０と示した時に、信号を送れないという仕様があるようで、「０になったらスキップする」というプログラムをしてグラフ化することに成功しました。<br>
+                        箱の側面にアクリルを配置しているのは光を拡散させるための装飾です。<br>
+                        
+
+                    </p>
+                    <h3 class="sub-title">
+                        反省点
+                    </h3>
+                    <p>
+
+                    </p>
+
+                    <h3 class="sub-title">
+                        ソースコード
+                    </h3>
+                    <p>
+                        <code>
+                            <ol style="list-style:decimal-leading-zero outside;in-left:0;padding-left:36px;margin:0;background-color:#EEF;color:#000;">
+                            <li style="background-color:#EFF;">#include &lt;Adafruit_NeoPixel.h&gt;</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">#define NUM_PIXELS 5</li>
+                            <li style="background-color:#EEF;">#define PIN_PIXELS 6</li>
+                            <li style="background-color:#EFF;">Adafruit_NeoPixel pixels(NUM_PIXELS, PIN_PIXELS, NEO_GRB + NEO_KHZ800);</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">#define PRESSURE_SENSOR_PIN A0</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">#define LED_COLOR_R 255, 0, 0</li>
+                            <li style="background-color:#EEF;">#define LED_COLOR_Y 255, 255, 0</li>
+                            <li style="background-color:#EFF;">#define LED_COLOR_O 255, 69, 0</li>
+                            <li style="background-color:#EEF;">#define LED_COLOR_W 255, 255, 255</li>
+                            <li style="background-color:#EFF;">#define LED_COLOR_B 0, 0, 255</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">unsigned long startTime = 0;</li>
+                            <li style="background-color:#EEF;">unsigned long elapsedTime = 0;</li>
+                            <li style="background-color:#EFF;">const unsigned long ONE_HOUR = 3600000; // 1時間のミリ秒</li>
+                            <li style="background-color:#EEF;">const unsigned long LED_INTERVAL = ONE_HOUR / NUM_PIXELS; // 各LEDが点灯を開始する間隔</li>
+                            <li style="background-color:#EFF;"></li>
+                            <li style="background-color:#EEF;">int currentLED = 0;</li>
+                            <li style="background-color:#EFF;">int ledBrightness[NUM_PIXELS] = {0}; // 各LEDの明るさ</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">void setup() {</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;pixels.begin();</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;Serial.begin(9600);</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;pixels.clear();</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;pixels.show();</li>
+                            <li style="background-color:#EEF;">}</li>
+                            <li style="background-color:#EFF;"></li>
+                            <li style="background-color:#EEF;">void loop() {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;int sensorValue = analogRead(PRESSURE_SENSOR_PIN);</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;Serial.println(sensorValue);</li>
+                            <li style="background-color:#EFF;"></li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;if (sensorValue &gt;= 201) {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;// 圧力が201以上の場合、即座に消灯</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;resetLEDs();</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;} else if (sensorValue &lt;= 200) {</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;if (startTime == 0) {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;startTime = millis();</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;elapsedTime = millis() - startTime;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;unsigned long elapsedMinutes = elapsedTime / 60000;</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;Serial.print(<font style="color:brown;">"Elapsed time: "</font>);</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;Serial.print(elapsedMinutes);</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;Serial.println(<font style="color:brown;">" minutes"</font>);</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;updateLEDs();</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EFF;">}</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">void resetLEDs() {</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;startTime = 0;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;elapsedTime = 0;</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;currentLED = 0;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;for (int i = 0; i &lt; NUM_PIXELS; i++) {</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;ledBrightness[i] = 0;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;pixels.clear();</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;pixels.show();</li>
+                            <li style="background-color:#EEF;">}</li>
+                            <li style="background-color:#EFF;"></li>
+                            <li style="background-color:#EEF;">void updateLEDs() {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;for (int i = 0; i &lt;= currentLED; i++) {</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;if (i == currentLED) {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 現在のLEDの明るさを徐々に上げる</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unsigned long ledElapsedTime = elapsedTime % LED_INTERVAL;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ledBrightness[i] = map(ledElapsedTime, 0, LED_INTERVAL, 0, 255);</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;} else {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// 既に点灯済みのLEDは最大輝度に設定</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ledBrightness[i] = 255;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;// LEDの色を設定</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;uint32_t color;</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;switch (i) {</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 0: color = pixels.Color(0, 0, ledBrightness[i]); break; // 青</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 1: color = pixels.Color(ledBrightness[i], ledBrightness[i], ledBrightness[i]); break; // 白</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 2: color = pixels.Color(ledBrightness[i], ledBrightness[i], 0); break; // 黄</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 3: color = pixels.Color(ledBrightness[i], ledBrightness[i] * 69 / 255, 0); break; // オレンジ</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;case 4: color = pixels.Color(ledBrightness[i], 0, 0); break; // 赤</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;&nbsp;&nbsp;pixels.setPixelColor(i, color);</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;pixels.show();</li>
+                            <li style="background-color:#EEF;"></li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;// 次のLEDの点灯を開始するタイミングをチェック</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;if (elapsedTime &gt;= (currentLED + 1) * LED_INTERVAL &amp;&amp; currentLED &lt; NUM_PIXELS - 1) {</li>
+                            <li style="background-color:#EFF;">&nbsp;&nbsp;&nbsp;&nbsp;currentLED++;</li>
+                            <li style="background-color:#EEF;">&nbsp;&nbsp;}</li>
+                            <li style="background-color:#EFF;">}</li>
+                            </ol></code>
+
+                    </p>
                  
 
 
