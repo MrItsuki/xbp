@@ -747,6 +747,17 @@ progress {
   margin-right: auto;
   margin-left: auto;
 }
+#border {
+  border-bottom: 8px #dddddd solid;
+  padding: 20px;
+}
+#border-2 {
+  border-bottom: 2px #dddddd solid;
+  padding: 10px;
+}
+#side-border {
+  border-left: 2px #000 solid;
+}
 
 @media (min-width: 576px) {
   .container-sm, .container {
@@ -12068,6 +12079,13 @@ textarea.form-control-lg {
   .d-print-none {
     display: none !important;
   }
+}
+
+
+.album-body {
+  margin-top: 20px;
+  border-bottom: 2px #dddddd solid;
+
 }
 
 /*# sourceMappingURL=bootstrap.css.map */
