@@ -1,0 +1,39 @@
+.more-toggle,
+.hidden-content {
+  display: none;
+}
+
+.more-toggle:checked ~ .hidden-content {
+  display: block;
+}
+
+.more-button {
+  display: inline-block;
+  width: 200px;
+  height: 40px;
+  padding: 8px;
+  background-color: #0000ff;
+  color: #FFFFFF;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 24px;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity 0.3s;
+}
+
+.more-button::before {
+  content: 'もっと見る';
+}
+
+.more-toggle:checked ~ .more-button::before {
+  content: '閉じる';
+}
+
+.more-button:hover {
+  opacity: 0.7;
+}
+
+.more-button:active {
+  opacity: 0.4;
+}

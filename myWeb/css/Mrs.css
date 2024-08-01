@@ -1,0 +1,72 @@
+@charset "utf-8";
+
+.text1 {
+    color: #ff1493;
+  }
+  
+ .navbar {
+    width:60%;
+  }
+
+.form-control {
+    font-size: 1;
+}
+
+.nav-item {
+    list-style: none;
+    list-style: none;
+}
+
+.title1 {
+    font-size: 15px;
+  }
+
+  .text2 {
+    font-size: 13px;
+  }
+.Album-name {
+    font-weight: bold;
+    font-size: 30px;
+    margin-top: 8px;
+}
+
+.link-underline-opacity-25{
+    color: #ff1493;
+    text-decoration: none;
+    font-size: 15px;
+    font-family: Roboto;
+  }
+
+.text3 {
+    color: #ff1493;
+}
+
+.contents img {
+    width: 700px;
+    margin-top: 15px;
+    }
+
+.row img {
+    width: 1000px;
+    margin-top: 15px;
+}
+
+.artist-inf {
+    text-align: left;
+    margin-left: 70px;
+}
+.Mrs {
+    font-family: Roboto;
+    float: left;
+    margin-left: 70px;
+}
+
+.text4 {
+    font-weight: bold;
+    text-align: left;
+    margin-left: 70px;
+}
+.text5 {
+    text-align: left;
+    margin-left: 70px;
+}
