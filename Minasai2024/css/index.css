@@ -12,6 +12,9 @@ header {
     list-style: none;
     overflow: hidden;
   }
+#nav li:hover {
+    background: #36c362;
+}
    
   #nav li {
     width: 300px;
@@ -33,6 +36,8 @@ header {
 main{
     background-color: #e44625;
 }
+
+
 
 .accordion {
     max-width: 500px;

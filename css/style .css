@@ -85,10 +85,10 @@ img {
     background-position: center top;
 }
 #home {
-    background-image: url(../digi_fab/images/Foot_panel_nezinow.jpg);
+    background-image: url(../images/2024-08-20_18-32-21_465.jpeg);
     background-color: #ddd;
     background-blend-mode: soft-light;
-    min-height: 100vh;
+    min-height: 150vh;
     padding-bottom: 3%;
 }
 #home .page-title {
