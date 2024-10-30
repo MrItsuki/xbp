@@ -1,0 +1,19 @@
+body {
+    font-family: sans-serif;
+    padding: 2rem;
+}
+p {
+    margin-bottom: 1rem;
+}
+img {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 2rem;
+}
+
+.filter1 {
+    filter: drop-shadow(5px 10px 3px #856845);
+}
+.filter2 {
+    filter: drop-shadow(0 0 10px rgba(0,0,0,.6));
+}

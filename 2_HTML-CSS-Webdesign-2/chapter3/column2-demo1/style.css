@@ -1,0 +1,14 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.7;
+    padding: 2rem;
+}
+.new::after {
+  content: "NEW!";
+  font-size: .75rem;
+  background: #f99;
+  color: #fff;
+  padding: 5px;
+  margin-left: 5px;
+  border-radius: 3px;
+}

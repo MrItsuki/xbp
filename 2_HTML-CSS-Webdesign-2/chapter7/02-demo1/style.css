@@ -1,0 +1,6 @@
+div {
+    background: #0bd;
+    width: calc(100% / 3);
+    height: 100px;
+    padding: 16px;
+}

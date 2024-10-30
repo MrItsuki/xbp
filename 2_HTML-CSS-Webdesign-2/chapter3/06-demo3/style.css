@@ -1,0 +1,13 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.6;
+}
+
+p {
+    background: #efefef;
+    padding: 1.5rem;
+    max-width: 400px;
+    margin: 2rem auto;
+    border-radius: 15rem 1rem 8rem 1rem / 1rem 12rem 1rem 12rem;
+    border: 2px dashed #999;
+}

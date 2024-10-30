@@ -1,0 +1,13 @@
+body {
+    font-family: sans-serif;
+    padding: 1rem;
+}
+a {
+    margin: 1rem;
+    padding: 0.5rem;
+    color: #1c00b8;
+    display: block;
+}
+a[href*="twitter"] {
+    background: pink;
+}

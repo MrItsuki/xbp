@@ -1,0 +1,23 @@
+body {
+    font-family: sans-serif;
+    padding: 2rem 4rem;
+}
+p {
+    margin-bottom: 1rem;
+}
+img {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 3rem;
+    transition: transform .5s;
+}
+
+.transform1:hover {
+    transform: scaleX(1.5);
+}
+.transform2:hover {
+    transform: scaleY(.5);
+}
+.transform3:hover {
+    transform: scale(1.5, .5);
+}

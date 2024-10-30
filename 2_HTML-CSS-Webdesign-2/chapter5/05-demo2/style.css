@@ -1,0 +1,13 @@
+h1 {
+    background: #0bd;
+    width: 300px;
+    color: #333;
+    padding: 1rem;
+    margin: 1rem;
+}
+h1:hover {
+    background: #9d6;
+    width: 100%;
+    color: #fff;
+    transition: background 1s, width 2s ease-in-out;
+}

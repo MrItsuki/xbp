@@ -1,0 +1,19 @@
+body {
+    font-family: sans-serif;
+    padding: 2rem;
+}
+p {
+    margin-bottom: 1rem;
+}
+img {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 2rem;
+}
+
+.filter1 {
+    filter: brightness(50%);
+}
+.filter2 {
+    filter: brightness(150%);
+}

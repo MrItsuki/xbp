@@ -1,0 +1,13 @@
+div {
+    background: #0bd;
+    padding: 1rem;
+    margin: 1rem;
+    width: 200px;
+    height: 200px;
+}
+div:hover {
+    background: #9d6;
+}
+.transition-1s {
+    transition: background 1s;
+}

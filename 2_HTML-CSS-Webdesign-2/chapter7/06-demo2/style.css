@@ -1,0 +1,19 @@
+header {
+  padding: 2rem;
+}
+header h1 {
+  font-size: 3rem;
+}
+
+footer {
+  text-align: center;
+}
+
+.buttton {
+  background: #0bd;
+}
+
+.item {
+  background: #000;
+}
+/*# sourceMappingURL=style.css.map */

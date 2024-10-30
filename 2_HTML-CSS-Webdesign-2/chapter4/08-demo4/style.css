@@ -1,0 +1,11 @@
+body {
+    font-family: sans-serif;
+    padding: 1rem;
+}
+li {
+    margin: 1rem;
+    padding: 0.5rem;
+}
+li[class|="list"] {
+    background: pink;
+}

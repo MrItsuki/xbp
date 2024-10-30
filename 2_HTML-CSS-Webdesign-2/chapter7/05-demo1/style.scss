@@ -1,0 +1,9 @@
+.buttton {
+  background: #0bd;
+  &.mb{
+    margin-bottom: 20px;
+  }
+  &:hover {
+    background: #0090aa;
+  }
+}

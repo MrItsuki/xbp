@@ -1,0 +1,26 @@
+html, body {
+    height: 100%;
+}
+body {
+    color: #333;
+    line-height: 1.6;
+    font-family: sans-serif;
+
+    display: flex;
+    flex-direction: column;
+}
+article {
+    flex: 1;
+    padding: 2rem;
+}
+
+h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+footer {
+    background: #0bd;
+    color: #fff;
+    text-align: center;
+    padding: 2rem 0;
+}

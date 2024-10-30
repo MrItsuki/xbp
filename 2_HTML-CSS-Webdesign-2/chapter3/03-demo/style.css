@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+body {
+    line-height: 1.6;
+}
+header {
+    background: #0bd;
+    display: flex;
+    padding: 2.5rem 1rem;
+}
+article {
+    padding: 1rem;
+}
+h1 {
+    margin-right: auto;
+    font-size: 3rem;
+    font-weight: bold;
+    color: #fff;
+}
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+button {
+    background: #fff;
+    border-radius: 5px;
+    padding: 1rem;
+    color: #0bd;
+}
+p {
+    margin-bottom: 1rem;
+}
+
+/*
+高さを基準にしたメディアクエリー
+================================================ */
+@media (max-height: 420px) {
+    header {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+    button {
+        padding: .5rem 1rem;
+    }
+}

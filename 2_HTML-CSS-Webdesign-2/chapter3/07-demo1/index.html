@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>カーソルを合わせるとサブメニューを表示する デモ</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/destyle.css@1.0.5/destyle.css">
+        <link href="style.css" rel="stylesheet">
+    
+    <!-- Font Awesome ----
+        このFont AwesomeキットIDは他のWebサイトに使いまわしできません。
+        Font Awesomeを利用する場合はP.70〜71を参考にFont Awesomeのアカウントを登録し、
+        ご自身のキットIDで制作してください。
+    -->
+        <script src="https://kit.fontawesome.com/3ccfc7e4b4.js" crossorigin="anonymous"></script>
+    </head>
+
+	<body>
+        <nav>
+            <ul class="main-menu">
+                <li><a href="#">ホーム</a></li>
+                <li class="has-menu">
+                    <a href="#">サービス</a>
+                    <ul class="sub-menu">
+                        <li><a href="#">サービス A</a></li>
+                        <li><a href="#">サービス B</a></li>
+                        <li><a href="#">サービス C</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">会社概要</a></li>
+                <li><a href="#">お問い合わせ</a></li>
+            </ul>
+        </nav>
+	</body>
+</html>

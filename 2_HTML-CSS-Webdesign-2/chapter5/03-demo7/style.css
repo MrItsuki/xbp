@@ -1,0 +1,9 @@
+body {
+    background-color: #4db1ec;
+    background-image: url('images/hero.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: color-burn;
+    height: 100vh;
+}

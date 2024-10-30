@@ -1,0 +1,23 @@
+body {
+    font-family: sans-serif;
+    line-height: 1.7;
+    padding: 2rem;
+}
+a {
+    color: #0bd;
+}
+a::before {
+    padding: 0 5px;
+}
+/* 外部リンク */
+a[href^="http://"]::before {
+    content: url(images/link.svg);
+}
+/* メール */
+a[href^="mailto:"]::before {
+    content: url(images/email.svg);
+}
+/* PDF */
+a[href$=".pdf"]::before {
+    content: url(images/doc.svg);
+}

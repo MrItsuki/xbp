@@ -1,0 +1,23 @@
+body {
+    font-family: sans-serif;
+    padding: 2rem;
+}
+h1 {
+    display: flex;
+    font-size: 2rem;
+}
+h1:before,
+h1:after {
+    flex: 1;
+    height: 2px;
+    content: '';
+    background-color: #ddd;
+    position: relative;
+    top: 1rem;
+}
+h1:before {
+    margin-right: 1rem;
+}
+h1:after {
+    margin-left: 1rem;
+}

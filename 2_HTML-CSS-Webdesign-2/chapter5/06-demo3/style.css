@@ -1,0 +1,18 @@
+body {
+    padding: 1rem;
+    font-family: sans-serif;
+}
+img {
+    width: 400px;
+}
+img:hover {
+    animation: hover-flash 1s;
+}
+@keyframes hover-flash {
+    0% {
+        opacity: .2;
+    }
+    100% {
+        opacity: 1;
+    }
+}

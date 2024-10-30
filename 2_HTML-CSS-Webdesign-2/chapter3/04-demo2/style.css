@@ -1,0 +1,22 @@
+.clover {
+  display: flex;
+  flex-wrap: wrap;
+  width: 420px;
+  margin: 20px auto;
+}
+.clover img {
+  margin: 5px;
+  width: 200px;
+}
+.spring {
+  border-radius: 50% 50% 0 50%;
+}
+.summer {
+  border-radius: 50% 50% 50% 0;
+}
+.autumn {
+  border-radius: 50% 0 50% 50%;
+}
+.winter {
+  border-radius: 0 50% 50% 50%;
+}

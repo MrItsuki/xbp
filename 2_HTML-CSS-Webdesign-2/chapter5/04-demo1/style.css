@@ -1,0 +1,17 @@
+:root {
+    --bg: pink;
+    --BG: orange;
+  }
+p {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 2rem;
+    margin: 1rem;
+}
+
+.box1 {
+    background: var(--bg);
+}
+.box2 {
+    background: var(--BG);
+}

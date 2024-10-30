@@ -1,0 +1,17 @@
+:root {
+    --bg: pink;
+}
+@media (min-width: 600px) {
+    :root {
+        --bg: orange;
+    }
+}
+
+body {
+    background: var(--bg);
+}
+
+p {
+    padding: 3rem;
+    line-height: 1.6;
+}

@@ -1,0 +1,14 @@
+body {
+    padding: 4rem;
+    font-family: sans-serif;
+}
+
+h1 {
+    background: #0bd;
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    width: 500px;
+    color: #fff;
+    -webkit-clip-path: polygon(0 0, 470px 0, 100% 50%, 470px 100%, 0 100%);
+    clip-path: polygon(0 0, 470px 0, 100% 50%, 470px 100%, 0 100%);
+}

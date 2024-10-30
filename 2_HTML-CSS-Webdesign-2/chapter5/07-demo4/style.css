@@ -1,0 +1,6 @@
+div {
+    background: #0bd;
+    height: 100vh;
+    -webkit-clip-path: circle(50% at 0 0);
+    clip-path: circle(50% at 0 0);
+}

@@ -1,0 +1,15 @@
+body {
+    font-family: sans-serif;
+    padding: 1rem;
+}
+h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+li {
+    margin: .5rem;
+    padding: .5rem;
+}
+li:nth-child(3n+1) {
+    background: #c1eff7;
+}

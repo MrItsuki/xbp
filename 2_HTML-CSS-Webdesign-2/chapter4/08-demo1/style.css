@@ -1,0 +1,12 @@
+body {
+    font-family: sans-serif;
+    padding: 1rem;
+}
+input {
+    border: 2px solid #ccc;
+    padding: .5rem;
+    margin-bottom: 1rem;
+}
+input[required] {
+    background: pink;
+}

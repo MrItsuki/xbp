@@ -1,0 +1,22 @@
+body {
+    padding: 1rem;
+    font-family: sans-serif;
+}
+div {
+    background: pink;
+    padding: 1rem;
+    display: inline-block;
+    animation-name: box-size;
+    animation-duration: 6s;
+}
+@keyframes box-size {
+    0% {
+        background: skyblue;
+    }
+    50% {
+        background: plum;
+    }
+    100% {
+        background: pink;
+    }
+}

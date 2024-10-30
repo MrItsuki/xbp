@@ -1,0 +1,16 @@
+body {
+    background-image: url('images/hero.jpg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    height: 100vh;
+    font-family: sans-serif;
+    line-height: 1.4;
+}
+h1 {
+    font-size: 6rem;
+    text-align: center;
+    font-weight: bold;
+    padding-top: 16rem;
+    mix-blend-mode: overlay;
+}

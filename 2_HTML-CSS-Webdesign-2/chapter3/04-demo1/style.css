@@ -1,0 +1,11 @@
+body {
+  padding: 2rem;
+}
+h1 {
+  font-size: 2rem;
+  font-family: sans-serif;
+  font-weight: bold;
+  display: inline-block;
+  background-image: linear-gradient(transparent 50%, #ff6 50%);
+  padding-bottom: .25rem;
+}

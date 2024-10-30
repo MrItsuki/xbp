@@ -1,0 +1,44 @@
+body {
+    font-family: sans-serif;
+    padding-top: 2rem;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+}
+.prev,
+.next {
+    display: inline-block;
+    background: #0bd;
+    color: #fff;
+    margin: 0 1px;
+}
+.prev:hover,
+.next:hover {
+    background: #0090aa;
+}
+.prev {
+    border-radius: 2rem 0 0 2rem;
+    padding: 1rem 1rem 1rem 2rem;
+}
+.next {
+    border-radius: 0 2rem 2rem 0;
+    padding: 1rem 2rem 1rem 1rem;
+    text-align: right;
+}
+
+/* 矢印アイコン */
+.prev::before,
+.next::after {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+}
+.prev::before {
+    content: "\f060";
+    margin-right: .5rem;
+}
+.next::after {
+    content: "\f061";
+    margin-left: .5rem;
+}

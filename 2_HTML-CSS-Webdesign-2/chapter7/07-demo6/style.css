@@ -1,0 +1,10 @@
+h2 {
+  font-size: 2rem;
+}
+@media (min-width: 600px) {
+  h2 {
+    font-size: 5rem;
+  }
+}
+
+/*# sourceMappingURL=style.css.map */

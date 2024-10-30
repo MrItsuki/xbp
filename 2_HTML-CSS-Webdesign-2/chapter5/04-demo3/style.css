@@ -1,0 +1,22 @@
+p {
+    font-family: sans-serif;
+    text-align: center;
+    margin: 1rem;
+    border: 3px solid pink;
+}
+
+.box1 {
+    /* 間違った書き方 */
+    --main-padding: 2;
+    padding: var(--main-padding)rem;
+}
+.box2 {
+    /* 正しい書き方 */
+    --main-padding: 2rem;
+    padding: var(--main-padding);
+}
+.box3 {
+    /* calc関数を使う */
+    --main-padding: 2;
+    padding: calc(var(--main-padding) * 1rem);
+}

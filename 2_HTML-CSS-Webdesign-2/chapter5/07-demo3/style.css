@@ -1,0 +1,6 @@
+div {
+    background: #0bd;
+    height: 100vh;
+    -webkit-clip-path: ellipse(80% 100% at 50% 0);
+    clip-path: ellipse(80% 100% at 50% 0);
+}

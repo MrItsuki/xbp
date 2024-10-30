@@ -1,0 +1,32 @@
+body {
+    font-family: serif;
+    line-height: 2;
+}
+.wrapper {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+blockquote {
+    position: relative;
+    padding: 2rem;
+}
+blockquote::before,
+blockquote::after {
+    content: '';
+    width: 40px;
+    height: 40px;
+    position: absolute;
+}
+blockquote::before {
+    border-top: 2px solid #ccc;
+    border-left: 2px solid #ccc;
+    top: 0;
+    left: 0;
+}
+blockquote::after {
+    border-bottom: 2px solid #ccc;
+    border-right: 2px solid #ccc;
+    bottom: 0;
+    right: 0;
+}

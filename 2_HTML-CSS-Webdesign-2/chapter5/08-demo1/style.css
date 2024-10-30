@@ -1,0 +1,11 @@
+div {
+    padding: 5rem 1rem;
+    height: 50vh;
+    text-align: center;
+}
+.horizontal {
+    background: linear-gradient(90deg, #4db1ec, #a2e29b);
+}
+.angled {
+    background: linear-gradient(125deg, #ffd673, #ffb2c1);
+}

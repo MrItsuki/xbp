@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+        <meta charset="utf-8">
+        <title>レスポンシブ画像 デモ</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/destyle.css@1.0.5/destyle.css">
+        <link href="style.css" rel="stylesheet">
+    </head>
+
+	<body>
+        <img src="800.png" 
+            srcset="400.png 400w,
+                    800.png 800w,
+                    1200.png 1200w"
+            sizes="(min-width: 800px) 800px, 100vw" 
+            alt="デモ画像">
+    </body>
+</html>

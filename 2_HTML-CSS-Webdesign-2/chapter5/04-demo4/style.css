@@ -1,0 +1,9 @@
+:root {
+    --main-color: pink;
+    --sub-color: orange;
+    --bg-gradation: linear-gradient(var(--main-color), var(--sub-color)) fixed;
+}
+
+body {
+    background: var(--bg-gradation);
+}
