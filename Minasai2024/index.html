@@ -1,213 +1,164 @@
 <!DOCTYPE html>
-<html lang="jp">
+<html lang="ja">
     <head>
-        <meta charset="UTF-8">
+        <meta charset="utf-8">
         <title>2024年度 赤本王 特設サイト</title>
-        <link rel="stylesheet" href="./css/index.css">
+        <meta name="description" content="神奈川大学みなとみらい祭の企画　赤本王のページ">
         <link rel="shortcut icon" href="./images/icon.webp" type="image/x-icon">
-        
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/destyle.css@1.0.5/destyle.css">
+        <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DotGothic16&family=Lobster&family=M+PLUS+Rounded+1c&family=Shippori+Antique+B1&display=swap" rel="stylesheet">
+        <link href="css/style.css" rel="stylesheet">
     </head>
-    <body>
-        <main>
-            <header>
-                
-                <ul id="nav">
-                    <li><a href="https://kummcfes.com/" target="blank">みなとみらい祭HP</a></li>
-                    <li><a href="./index.html">赤本王 TOP</a></li>
-                    <li><a href="./Answer.html">解答</a></li>
-                    <li><a href="./Japanese.html">国語</a></li>
-                    <li><a href="./Math.html">数学</a></li>
-                    <li><a href="./J-History.html">日本史</a></li>
-                    <li><a href="./W-History.html">世界史</a></li>
-                    <li><a href="./Geoglafe.html">地理</a></li>         
-                    <li><a href="./Public.html">公共</a></li> 
 
-                </ul>
-              </header>
+	<body>
+        <header>
+            <div class="wrapper">
+                <a class="logo" href="#hero">赤本王</a>
+                <nav>
+                    <button class="btn-menu">メニュー</button>
+                    <ul class="main-nav">
+                        <li><a href="#answer">解答</a></li>
+                        <li><a href="#about2">概要</a></li>
+                        <li><a href="#speakers">企画長の言葉</a></li>
+                        <li><a href="#survey">アンケート</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
 
-              <!--<img src="" alt="">-->
-
-              <h1 class="title" style="position: center;">赤本王　2024 MM祭</h1>
-
-              <h1 class="heading">企画内容</h1>
-              <div class="box">
-                <div class="contents" style="display: block; text-align: center;">
-                    <details class="accordion">
-                        <summary>赤本王</summary>
-                        <p>
-                            <table style="background-color: white; margin: 10px; margin-bottom: 10px;">
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 70px;">対象者</td>
-                                        <td>みなとみらい祭参加者</td>
-                                    </tr>
-                                    <tr>
-                                        <td>企画概要</td>
-                                        <td>神奈川大学の過去の入試問題を解いていただきます。ランキング上位者は当特設ページにてニックネームと点数を掲載させていただきます。また両日先着順にて来場特典をお渡ししております。ぜひお越しください！</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                       </p>
-                    </details>
-                    <details class="accordion">
-                        <summary>受験相談</summary>
-                        <p> 
-                            <table style="background-color: white; margin: 10px; margin-bottom: 10px;">
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 70px;">対象者</td>
-                                        <td>2024年度受験生の方、保護者様</td>
-                                    </tr>
-                                    <tr>
-                                        <td>企画概要</td>
-                                        <td>現役大学生の先輩から受験期にどのように勉強をしていたかまた大学生活はどのようなものなのか相談することができます。またこの企画は来場特典の対象外となっておりますので予めご了承ください。</td>
-                                    </tr>
-                                </tbody>
-                             </table>
-                         </p>
-                    </details>
-                    <details class="accordion">
-                        <summary>CM放映</summary>
-                        <p>今回本学園祭にご協賛をいただいた世界思想社教学社様のコマーシャル映像を放映いたします。</p>
-                    </details>
-                </div>
-                <ul>
-                    <li>企画はすべて6Fラーニングコモンズにて終日行います</li>
-                    <li>12:00～13:00は全スタッフ一律のお昼休憩をはさむため運営を一時中止します。予めご了承ください。</li>
-                </ul>
-              </div>
-
+        <section id="hero">
+            <div class="wrapper">
+                <h1>赤本王</h1>
+                <p class="hero-date">2024. 11. 2. 10:00 - 17:00<br>
+                2024. 11. 3. 10:00 - 17:00</p>
               
-
-            <h1 class="heading">来場者アンケート</h1>
-            <!--
-            <form action="https://docs.google.com/forms/d/e/1FAIpQLScoidMBaLiJ2dOXj1o0tlYTNQJHZAqYdEWWpVW4V2J4OPqnhg/formResponse" method="post">
-                
-        
-                <label>ご満足度</label>
-        <div class="radio-group">
-            <input type="radio" id="satisfaction1" name="entry.326955045" value="1">
-            <label for="satisfaction1" style="display: inline;">満足している</label>
-
-            <input type="radio" id="satisfaction2" name="entry.618144708" value="2">
-            <label for="satisfaction2" style="display: inline;">どちらかというと満足している</label>
-
-            <input type="radio" id="satisfaction3" name="entry.618144708" value="3">
-            <label for="satisfaction3" style="display: inline;">どちらとも言えない</label>
-
-            <input type="radio" id="satisfaction4" name="entry.326955045_sentinel" value="4">
-            <label for="satisfaction4" style="display: inline;">どちらかというと満足していない</label>
-
-            <input type="radio" id="satisfaction5" name="entry.326955045_sentinel" value="5">
-            <label for="satisfaction5" style="display: inline;">満足していない</label>
-        </div>
-
-        <label for="comments">なぜそのように思いましたか？</label>
-                <textarea id="comments" name="geS5N"></textarea>
-                <br><br>
-
-            <label>どの企画が一番良かったですか？</label>
-        <div class="select3">
-            <input type="radio" id="satisfaction3" name="entry.451439425_sentine" value="3">
-            <label for="satisfaction3" style="display: inline;">赤本王</label>
-
-            <input type="radio" id="satisfaction4" name="entry.451439425_sentine" value="4">
-            <label for="satisfaction4" style="display: inline;">受験相談</label>
-
-            <input type="radio" id="satisfaction5" name="entry.451439425_sentine" value="5">
-            <label for="satisfaction5" style="display: inline;">CM放映</label>
-        </div>
-        <br><br>
-
-        <label>もし来年も開催したら参加したいですか？</label>
-        <div class="select3">
-            <input type="radio" id="satisfaction3" name="entry.618144708_sentinel" value="3">
-            <label for="satisfaction3" style="display: inline;">参加したい</label>
-
-            <input type="radio" id="satisfaction4" name="entry.618144708_sentinel" value="4">
-            <label for="satisfaction4" style="display: inline;">どちらともいえない</label>
-
-            <input type="radio" id="satisfaction5" name="entry.618144708_sentinel" value="5">
-            <label for="satisfaction5" style="display: inline;">参加したくない</label>
-        </div>
-        <br><br>
-
-        
-                <label for="comments">最後にご意見、ご感想をどうぞ！</label>
-                <textarea id="comments" name="comments"></textarea>
-                <br><br>
-        
-                <button type="submit">送信</button>-->
-            
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScoidMBaLiJ2dOXj1o0tlYTNQJHZAqYdEWWpVW4V2J4OPqnhg/viewform" width="100%" height="1106" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
-
-            <h1 class="heading">担当スタッフのプロフィール</h1>
-
-              <div class="container">
-                <div class="profile-card">
-                    <img src="../images/0_XBlogo.png" alt="プロフィール写真">
-                    <h2>あつき</h2>
-                    <p>経営学部国際経営学科</p>
-                    <p>指定校推薦入試、給費生試験</p>
-                    <div class="comment">
-                        <p>受験相談はもちろん、経営学部の特プロ"エクスビジネスプログラム"についても答えます！</p>
-                    </div>
-                </div>
-                <div class="profile-card">
-                    <img src="./images/profile.JPG" alt="プロフィール写真">
-                    <h2>いつき</h2>
-                    <p>経営学部国際経営学科</p>
-                    <p>入試区分</p>
-                    <div class="comment">
-                        <p>コメント</p>
-                    </div>
-                </div>
-                <div class="profile-card">
-                    <img src="./images/profile.JPG" alt="プロフィール写真">
-                    <h2>名前</h2>
-                    <p>学部学科</p>
-                    <p>入試区分</p>
-                    <div class="comment">
-                        <p>コメント</p>
-                    </div>
-                </div>
-                <div class="profile-card">
-                    <img src="./images/profile.JPG" alt="プロフィール写真">
-                    <h2>名前</h2>
-                    <p>学部学科</p>
-                    <p>入試区分</p>
-                    <div class="comment">
-                        <p>コメント</p>
-                    </div>
-                </div>
             </div>
+        </section>
 
-            <div class="container">
-                <div class="profile-card">
-                    <img src="./images/profile.JPG" alt="プロフィール写真">
-                    <h2>名前</h2>
-                    <p>学部学科</p>
-                    <p>入試区分</p>
-                    <div class="comment">
-                        <p>コメント</p>
-                    </div>
+        <section id="answer" class="wrapper">
+            <h2>解答</h2>
+            <div class="slide-wrap">
+                <div class="slide-box">
+                  <a href="URL">
+                    <img src="./images/akahon_japanese.png">
+                    <p>国語</p>
+                  </a>
                 </div>
-                <div class="profile-card">
-                    <img src="./images/profile.JPG" alt="プロフィール写真">
-                    <h2>名前</h2>
-                    <p>学部学科</p>
-                    <p>入試区分</p>
-                    <div class="comment">
-                        <p>コメント</p>
-                    </div>
+                <div class="slide-box">
+                  <a href="URL">
+                    <img src="./images/akahon_math.png">
+                    <p>数学</p>
+                  </a>
                 </div>
+                <div class="slide-box">
+                  <a href="URL">
+                    <img src="./images/akahon_japan.png">
+                    <p>日本史</p>
+                  </a>
+                </div>
+                <div class="slide-box">
+                  <a href="URL">
+                    <img src="./images/akahon_world.png">
+                    <p>世界史</p>
+                  </a>
+                </div>
+                <div class="slide-box">
+                  <a href="URL">
+                    <img src="./images/akahon_geography.png">
+                    <p>地理</p>
+                  </a>
+                </div>
+                <div class="slide-box">
+                  <a href="URL">
+                    <img src="./images/akahon_public.png">
+                    <p>公共</p>
+                  </a>
+                </div>
+              </div>
+        </section>
+
+        <section id="about2">
+            <h2>概要</h2>
+            <div class="wrapper">
+                <ol class="about2">
+                    <li class="about2-item">
+                        <h3 class="about2-title">対象者</h3>
+                        <p class="about2-content">
+                            みなとみらい祭来場者
+                        </p>
+                    </li>
+                    <li class="about2-item">
+                        <h3 class="about2-title">内容</h3>
+                        <p class="about2-content">
+                            神奈川大学の過去問、委員自作の予想問題を解いてみよう！
+                        </p>
+                    </li>
+                    <li class="about2-item">
+                        <h3 class="about2-title">高得点の方</h3>
+                        <p class="about2-content">
+                            得点上位の方にはニックネームと得点をこのWebサイトにて掲載します！※希望者のみ
+                        </p>
+                    </li>
+                    <li class="about2-item">
+                        <h3 class="about2-title">特典</h3>
+                        <p class="about2-content">
+                        両日先着順にて得点があります！
+                        </p>
+                    </li>
+                </ol>
+               
             </div>
+        </section>
+        
 
-            
+        <section id="speakers" class="wrapper">
+            <h2>Speakers</h2>
+            <div class="speakers-list">
+                <div class="speakers-text">
+                    <h3>Mana</h3>
+                    <p>
+                        日本で2年間グラフィックデザイナーとして働いた後、カナダ・バンクーバーにあるWeb制作の学校を卒業。
+                        カナダやオーストラリア、イギリスの企業でWebデザイナーとして働きました。
+                        現在はWebサイト制作のインストラクターとして教育関連を頑張ってます。
+                    </p>
+                </div>
+                <img src="images/mana.jpg" alt="Mana">
+            </div>
+            <div class="speakers-list">
+                <div class="speakers-text">
+                    <h3>Tatsuya</h3>
+                    <p>
+                        株式会社Sample Web代表。学生時代より独学でWebサイト制作を学び、
+                        デザイナーの働きやすい環境を求めて独立。
+                        音楽・アート関連のWebサイト制作やアプリ制作をはじめ、イベントの主催や登壇なども行っています。
+                    </p>
+                </div>
+                <img src="images/tatsuya.jpg" alt="Tatsuya">
+            </div>
+        </section>
 
-            <footer>
-                <p>&copy All rights reserved</p>
-            </footer> 
-        </main>
-    </body>
+        <section id="survey">
+            <h2>アンケート</h2>
+            <form class="survey-form" action="#">
+                <label>Name</label>
+                <input class="survey-field" type="text" placeholder="例：大本真奈美">
+                <label>Email</label>
+                <input class="survey-field" type="email" placeholder="例：hello@example.com">
+                <input class="survey-btn" type="submit" value="Join Now!">
+            </form>
+
+            <div class="footer wrapper">
+                <p>
+                    <a href="mailto:info@example.om">お問い合わせ</a> / <small>&copy; 2021 WCB Conference</small>
+                </p>
+            </div>
+        </section>
+
+    <!-- JavaScript -->
+        <script src="js/script.js"></script>
+	</body>
 </html>
