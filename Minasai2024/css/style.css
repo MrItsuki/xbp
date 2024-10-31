@@ -138,9 +138,10 @@ HERO
 }
 .hero-date {
     text-align: center;
-    border-top: 3px solid var(--grey);
-    border-bottom: 3px solid var(--grey);
+    border-top: 3px solid var(--white);
+    border-bottom: 3px solid var(--white);
     padding: .5rem 0;
+    color:var(--white) ;
     font-size: 1.85rem;
     margin-bottom: 1.5rem;
 }
