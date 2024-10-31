@@ -132,7 +132,7 @@ HERO
 }
 
 #hero h1 {
-    font-size: 3.5rem;
+    font-size: 9rem;
     margin-top: 5rem;
     margin-bottom: 9rem;
 }
@@ -141,9 +141,12 @@ HERO
     border-top: 3px solid var(--grey);
     border-bottom: 3px solid var(--grey);
     padding: .5rem 0;
-    font-size: 3rem;
+    font-size: 1.85rem;
     margin-bottom: 1.5rem;
 }
+
+
+
 /*
 ABOUT2
 ================================================ */
@@ -164,23 +167,6 @@ ABOUT2
     font-family: "Noto Sans JP", serif;
 }
 
-@media (min-width: 600px) {
-    .about2-item {
-        display: flex;
-        margin-bottom: 0;
-    }
-    .about2-title {
-        width: 24%;
-        padding: 2rem 2.5rem 2rem 0;
-        text-align: right;
-    }
-    .about2-content {
-        border-left: 5px solid #bdae5b;
-        width: 76%;
-        padding: 1.5rem 0 1.5rem 2.5rem;
-    }
-    
-}
 
 /*
 ANSWER
@@ -301,6 +287,49 @@ survey
 }
 
 /*
+SLIDESHOW
+=============================================== */
+/* 通常（PC）ではタイル表示 */
+.slide-wrap {
+    background-color: #ccc;
+    display: flex;
+    margin: 0 auto;
+    max-width: 1024px;
+    width: 100%;
+  }
+  .slide-box {
+    height: auto;
+    margin: .5%;
+    width: 24%;
+  }
+  .slide-box a {
+    background-color: #fff;
+    color: #222;
+    display: block;
+    text-decoration: none;
+  }
+  .slide-box img {
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+  .slide-box p {
+    font-weight: bold;
+    padding: 10px;
+    margin:.5rem auto;
+  }
+  @media screen and (max-width: 768px) {
+  /* スマホサイズでスライダー表示 */
+    .slide-wrap {
+      overflow-x: scroll;
+    }
+    .slide-box {
+      flex: 0 0 70%;
+      margin: auto 1% auto auto;
+    }
+  }
+
+/*
 FOOTER
 ================================================ */
 .footer {
@@ -313,6 +342,7 @@ FOOTER
 .footer a {
     text-decoration: underline;
 }
+
 
 /*
 DESKTOP SIZE
@@ -354,6 +384,7 @@ DESKTOP SIZE
     }
 /* about2
  */
+
     .about2-table td {
         display: table-cell;
     }
@@ -363,6 +394,21 @@ DESKTOP SIZE
     .about2-content {
         padding: 1rem 1rem 1rem 0;
     }
+    .about2-item {
+        display: flex;
+        margin-bottom: 0;
+    }
+    .about2-title {
+        width: 24%;
+        padding: 2rem 2.5rem 2rem 0;
+        text-align: right;
+    }
+    .about2-content {
+        border-left: 5px solid #bdae5b;
+        width: 76%;
+        padding: 1.5rem 0 1.5rem 2.5rem;
+    }
+    
 /* Speakers */
     #speakers h2 {
         margin-bottom: 4rem;
