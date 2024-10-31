@@ -144,54 +144,92 @@ HERO
     font-size: 3rem;
     margin-bottom: 1.5rem;
 }
+/*
+ABOUT2
+================================================ */
+.about2 {
+    list-style: decimal inside;
+    font-family:  "Shippori Antique B1", sans-serif;
+}
+.about2-item {
+    margin-bottom: 2rem;
+}
+.about2-title {
+    font-size: 1.375rem;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+.about2-content {
+
+    font-family: "Noto Sans JP", serif;
+}
+
+@media (min-width: 600px) {
+    .about2-item {
+        display: flex;
+        margin-bottom: 0;
+    }
+    .about2-title {
+        width: 24%;
+        padding: 2rem 2.5rem 2rem 0;
+        text-align: right;
+    }
+    .about2-content {
+        border-left: 5px solid #bdae5b;
+        width: 76%;
+        padding: 1.5rem 0 1.5rem 2.5rem;
+    }
+    
+}
 
 /*
-ABOUT
+ANSWER
 ================================================ */
-#about {
+#answer {
     padding: 4rem 1rem;
 }
-#about h2 {
+#answer h2 {
   background: linear-gradient(var(--yellow), var(--orange));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   text-fill-color: transparent;
 }
-#about p {
+#answer p {
     margin-bottom: 2rem;
 }
 
 /*
-answer
+about2
 ================================================ */
-#answer
+#about2
  {
     background-image: linear-gradient(var(--light-green), var(--green));
     padding: 7rem 0;
     -webkit-clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
     clip-path: polygon(0 0, 100% 10%, 100% 90%, 0 100%);
 }
-#answer
+#about2
  h2 {
     color: var(--white);
 }
-.answer-table {
+.about2-table {
     color: var(--white);
     width: 100%;
+     font-family: "Noto Sans JP", serif;
 }
-.answer-table tr {
+.about2-table tr {
     border-bottom: 1px solid rgba(255,255,255,.5);
 }
-.answer-table td {
+.about2-table td {
     display: block;
     line-height: 1.5;
 }
-.answer-date {
+.about2-date {
     font-size: .875rem;
     padding-top: 1rem;
 }
-.answer-content {
+.about2-content {
     padding-bottom: 1rem;
 }
 
@@ -314,15 +352,15 @@ DESKTOP SIZE
     .hero-date {
         font-size: 3rem;
     }
-/* answer
+/* about2
  */
-    .answer-table td {
+    .about2-table td {
         display: table-cell;
     }
-    .answer-date {
+    .about2-date {
         padding: 1.125rem 0 1rem 1rem;
     }
-    .answer-content {
+    .about2-content {
         padding: 1rem 1rem 1rem 0;
     }
 /* Speakers */
