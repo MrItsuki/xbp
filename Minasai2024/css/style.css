@@ -255,15 +255,14 @@ SPEAKERS
 survey
 ================================================ */
 #survey {
-    background-image: linear-gradient(var(--pink), var(--purple));
+    background-image: linear-gradient(var(--pink), var(--light-blue));
     padding: 6rem 1rem 2rem;
-    -webkit-clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 100%);
-    clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 100%);
+   
 }
 #survey h2 {
     color: var(--white);
 }
-.survey-form {
+.survey-iframe {
     max-width: 480px;
     margin: 0 auto 5rem;
 }
@@ -349,6 +348,11 @@ FOOTER
 DESKTOP SIZE
 ================================================ */
 @media (min-width: 600px) {
+/* SURVEY */
+    .survey-iframe {
+    width: 100%;
+    margin: 0 auto 5rem;
+}
 /* Common */
     h2 {
         font-size: 5rem;
