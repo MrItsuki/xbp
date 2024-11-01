@@ -202,6 +202,21 @@ ABOUT2
     font-family: "Noto Sans JP", serif;
 }
 
+#realanswer {
+    padding: 4rem 1rem
+}
+#realanswer h2 {
+    background: linear-gradient(var(--yellow), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+}
+
+.realanswer h3{
+    font-size: 2rem
+}
+
 
 /*
 ANSWER

@@ -24,3 +24,9 @@ $(document).ready(function() {
     return false;
   });
 });
+
+function toggleAnswer(questionNumber) {
+  const answerElement = document.getElementById(`answer-${questionNumber}`);
+  answerElement.style.display = answerElement.style.display === "block" ? "none" : "block";
+}
+
