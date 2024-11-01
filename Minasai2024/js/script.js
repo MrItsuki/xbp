@@ -10,7 +10,7 @@ btn.addEventListener('click', () => {
   }
 });
 
-$(document).ready(() => {
+$(document).ready(function() {
   var pagetop = $('.pagetop');
   $(window).scroll(function () {
     if ($(this).scrollTop() > 100) {

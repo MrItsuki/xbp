@@ -66,10 +66,7 @@ h2,
     bottom: 30px;
     right: 15px;
 }
- img {
-    margin: 0 0 0 auto;
-    width: 15%;
-}
+ 
 .pagetop a {
     display: block;
     background-color: #ccc;
@@ -273,7 +270,7 @@ SPEAKERS
     margin-left: 1rem;
 }
 #speakers h2 {
-  background: linear-gradient(var(--light-blue), var(--blue));
+  background: linear-gradient(var(--akahon-red), var(--orange));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -283,9 +280,13 @@ SPEAKERS
     font-size: 1.5rem;
     margin-bottom: .5rem;
 }
+#speakers h4 {
+    font-size: medium;
+    margin-bottom: .5rem;
+}
 #speakers img {
-    border-radius: 50%;
-    width: 20%;
+    
+    width: 100%;
 }
 
 /*
@@ -365,6 +366,15 @@ SLIDESHOW
       margin: auto 1% auto auto;
     }
   }
+
+/*
+SLIDER========================================*/
+.slider  {
+    width: 100%;
+    background-position: center;
+    background-size: cover;
+    background-blend-mode: screen;
+}
 
 /*
 FOOTER

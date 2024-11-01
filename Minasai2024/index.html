@@ -14,6 +14,20 @@
         <link href="css/style.css" rel="stylesheet">
 
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/bxslider/4.2.12/jquery.bxslider.min.js"></script>
+
+        <script type="text/javascript">
+                $(document).ready(function(){
+                    $('.slider').bxSlider({
+                        auto: true,
+                        pause: 3000, // 画像がスライドするスピード
+                        slideWidth: 1080, // 画像の横幅
+                    });
+                });
+        </script>
+
 
        
     </head>
@@ -29,7 +43,7 @@
                     <ul class="main-nav">
                         <li><a href="#answer">解答</a></li>
                         <li><a href="#about2">概要</a></li>
-                        <li><a href="#speakers">企画長の言葉</a></li>
+                        <li><a href="#speakers">ランキング</a></li>
                         <li><a href="#survey">アンケート</a></li>
                     </ul>
                 </nav>
@@ -57,7 +71,7 @@
                   </a>
                 </div>
                 <div class="slide-box">
-                    <a href="URL">
+                    <a href="./Japanese.html">
                       <img src="./images/akahon_japanese.png" alt="国語">
                       
                     </a>
@@ -120,7 +134,7 @@
                     <li class="about2-item">
                         <h3 class="about2-title">特典</h3>
                         <p class="about2-content">
-                        両日先着順にて得点があります！
+                        両日先着順にて特典があります！
                         </p>
                     </li>
                 </ol>
@@ -130,42 +144,28 @@
         
 
         <section id="speakers" class="wrapper">
-            <h2>Speakers</h2>
-            <div class="speakers-list">
-                <div class="speakers-text">
-                    <h3>Mana</h3>
-                    <p>
-                        日本で2年間グラフィックデザイナーとして働いた後、カナダ・バンクーバーにあるWeb制作の学校を卒業。
-                        カナダやオーストラリア、イギリスの企業でWebデザイナーとして働きました。
-                        現在はWebサイト制作のインストラクターとして教育関連を頑張ってます。
-                    </p>
-                </div>
-                <img src="images/mana.jpg" alt="Mana">
-            </div>
-            <div class="speakers-list">
-                <div class="speakers-text">
-                    <h3>Tatsuya</h3>
-                    <p>
-                        株式会社Sample Web代表。学生時代より独学でWebサイト制作を学び、
-                        デザイナーの働きやすい環境を求めて独立。
-                        音楽・アート関連のWebサイト制作やアプリ制作をはじめ、イベントの主催や登壇なども行っています。
-                    </p>
-                </div>
-                <img src="images/tatsuya.jpg" alt="Tatsuya">
+            <h2>ランキング</h2>
+            <h4>○○時○○分更新</h4>
+            <div class="slider">
+                <img src="./images/Ranking_english.png" alt="数学">
+                <img src="./images/Ranking_english.png" alt="国語">
+                <img src="./images/Ranking_english.png" alt="英語">
+                <img src="./images/Ranking_english.png" alt="日本史">
+                <img src="./images/Ranking_english.png" alt="世界史">
+                <img src="./images/Ranking_english.png" alt="公共">
+                <img src="./images/Ranking_english.png" alt="地理">
             </div>
         </section>
 
         <section id="survey">
             <h2>アンケート</h2>
-            <iframe class="survey-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSc_qtsMSFd7R7LwAmooRsIS4FxYm4_FZ209NsHtXWKtSs_ruA/viewform?embedded=true" width="1000" height="2351" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
-
-            <div class="footer wrapper">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSc_qtsMSFd7R7LwAmooRsIS4FxYm4_FZ209NsHtXWKtSs_ruA/viewform?embedded=true" width="640" height="2255" frameborder="0" marginheight="0" marginwidth="0">読み込んでいます…</iframe>
                 <p>
                     <a href="https://kummcfes.com/%e3%81%8a%e5%95%8f%e3%81%84%e5%90%88%e3%82%8f%e3%81%9b/">お問い合わせ</a> / <small>みなとみらい祭実行委員</small>
                 </p>
             </div>
         </section>
-        <img class="pagetop" src="./images/akahonkun.png"><a href="#hero"></a></img>
+        <img class="pagetop" src="./images/akahonkun.png" width="15%"><a href="#hero"></a></img>
 
 
     <!-- JavaScript -->
