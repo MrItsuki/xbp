@@ -59,13 +59,16 @@ h2,
     font-family: "Shippori Antique B1", sans-serif;
 }
 
-
-
 .pagetop {
+   
     display: none;
     position: fixed;
     bottom: 30px;
     right: 15px;
+}
+ img {
+    margin: 0 0 0 auto;
+    width: 15%;
 }
 .pagetop a {
     display: block;
