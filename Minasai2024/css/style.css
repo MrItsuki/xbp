@@ -216,6 +216,17 @@ ABOUT2
 .realanswer h3{
     font-size: 2rem
 }
+#realanswer2 {
+    padding: 4rem 1rem
+}
+#realanswer2 h2 {
+    background: linear-gradient(var(--yellow), var(--orange));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+
+}
 
 
 /*
