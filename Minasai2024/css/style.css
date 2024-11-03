@@ -284,6 +284,7 @@ about2
 SPEAKERS
 ================================================ */
 #speakers {
+    margin-top: 5rem;
     padding: 4rem 1rem;
 }
 .speakers-list {
