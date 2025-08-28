@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>南極Q&Aアプリ</title>
+<style>
+  body {
+    margin: 0;
+    background: #cce7f2;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+  #antarctica {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    text-align: center;
+  }
+  #antarctica img {
+    width: 400px;
+    opacity: 0.8;
+  }
+  #question {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    font-weight: bold;
+    color: #003366;
+    text-shadow: 1px 1px 2px #fff;
+    z-index: 2;
+  }
+  .ice {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid #99c;
+    border-radius: 12px;
+    padding: 10px;
+    white-space: nowrap;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+  }
+  .ice:hover {
+    transform: scale(1.1);
+  }
+</style>
+</head>
+<body>
+  <div id="antarctica">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Antarctica.svg/640px-Antarctica.svg.png" alt="南極大陸">
+  </div>
+  <div id="question">今日の問い：あなたは最近好奇心を抱きましたか？</div>
+
+<script>
+const answers = [
+  "ペンギンの泳ぎ方",
+  "氷の中の気泡の年齢",
+  "オーロラの仕組み",
+  "南極の氷の厚さ",
+  "シャチの狩り方"
+];
+
+const icebergs = [];
+
+function createIce(answer) {
+  const ice = document.createElement('div');
+  ice.className = 'ice';
+  ice.textContent = answer;
+
+  // ランダムな位置（重なり防止のため調整）
+  let x, y, overlap;
+  do {
+    overlap = false;
+    x = Math.random() * (window.innerWidth - 150);
+    y = Math.random() * (window.innerHeight - 50);
+    for (const other of icebergs) {
+      const dx = other.x - x;
+      const dy = other.y - y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        overlap = true;
+        break;
+      }
+    }
+  } while (overlap);
+
+  ice.style.left = x + 'px';
+  ice.style.top = y + 'px';
+  document.body.appendChild(ice);
+
+  icebergs.push({el: ice, x, y, dx: (Math.random()-0.5)*0.5, dy: (Math.random()-0.5)*0.5});
+}
+
+answers.forEach((a, i) => setTimeout(() => createIce(a), i * 500));
+
+function animate() {
+  for (const berg of icebergs) {
+    berg.x += berg.dx;
+    berg.y += berg.dy;
+    if (berg.x < 0 || berg.x > window.innerWidth - 150) berg.dx *= -1;
+    if (berg.y < 0 || berg.y > window.innerHeight - 50) berg.dy *= -1;
+    berg.el.style.left = berg.x + 'px';
+    berg.el.style.top = berg.y + 'px';
+  }
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>

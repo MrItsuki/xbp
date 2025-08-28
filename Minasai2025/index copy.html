@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大学祭シフト管理アプリ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script defer src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script defer src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script defer src="https://unpkg.com/lucide-react@0.292.0/dist/lucide-react.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+
+    <style>
+        /* For better scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+    // --- イベントリスナーを削除し、直接コードを開始 ---
+
+    // --- Destructure React hooks and Lucide icons from window objects ---
+    const { useState, useEffect, useRef, useCallback } = React;
+    const { ArrowLeft, ArrowRight, Plus, Trash2, User, Users, MapPin, Clock, AlertTriangle, Wand2, Upload, GripVertical, Save, Share2, X, Settings, Image: ImageIcon } = lucide;
+
+    // --- Firebase Configuration ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyA9_DFDbGRpH5zsEtmW4bVXSmo_oAP_LM8",
+        authDomain: "mmfes-shift.firebaseapp.com",
+        projectId: "mmfes-shift",
+        storageBucket: "mmfes-shift.appspot.com",
+        messagingSenderId: "774888392732",
+        appId: "1:774888392732:web:9312e7f9d1481d7391f7d9",
+        measurementId: "G-YCMNSH4SP9"
+    };
+
+    // --- Firebase Initialization ---
+    let app;
+    let db;
+    let storage;
+    let auth;
+
+    try {
+        app = firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+        storage = firebase.storage();
+        auth = firebase.auth();
+    } catch (e) {
+        console.error("Firebase initialization error.", e);
+    }
+
+    // --- Main App Component ---
+    function App() {
+        // --- State Management ---
+        const [user, setUser] = useState(null);
+        const [staffs, setStaffs] = useState([]);
+        const [areas, setAreas] = useState([]);
+        const [shifts, setShifts] = useState({});
+        const [mapLayout, setMapLayout] = useState({ background: null, areas: {} });
+
+        const [activeTab, setActiveTab] = useState('shift-table');
+        const [modal, setModal] = useState(null);
+        const [isLoading, setIsLoading] = useState(true);
+        const [error, setError] = useState(null);
+
+        const [timeRange, setTimeRange] = useState({ start: 8, end: 22 });
+        const [mapTimelineValue, setMapTimelineValue] = useState(timeRange.start * 60);
+        const [draggedItem, setDraggedItem] = useState(null);
+
+        // --- Firebase Authentication ---
+        useEffect(() => {
+            if (!auth) {
+                setError("Firebaseの初期化に失敗しました。設定が正しいか確認してください。");
+                setIsLoading(false);
+                return;
+            }
+
+            auth.signInAnonymously().catch(err => {
+                console.error("Anonymous sign-in failed", err);
+                setError("データベースへの接続に失敗しました。Firebaseの設定やルールを確認してください。");
+                setIsLoading(false);
+            });
+
+            const unsubscribe = auth.onAuthStateChanged((currentUser) => {
+                if (currentUser) {
+                    setUser(currentUser);
+                    setIsLoading(false);
+                } else {
+                    setUser(null);
+                }
+            });
+            return () => unsubscribe();
+        }, []);
+
+        // --- Firestore Data Fetching ---
+        useEffect(() => {
+            if (!user || !db) return;
+            const unsubscribes = [];
+            const collections = { staffs: setStaffs, areas: setAreas };
+
+            Object.entries(collections).forEach(([collectionName, setter]) => {
+                const unsubscribe = db.collection(collectionName).onSnapshot((querySnapshot) => {
+                    const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setter(items);
+                }, (err) => {
+                    console.error(`Error fetching ${collectionName}:`, err);
+                    setError(`${collectionName}のデータ取得に失敗しました。`);
+                });
+                unsubscribes.push(unsubscribe);
+            });
+            
+            const unsubscribeShifts = db.collection('shifts').onSnapshot((snapshot) => {
+                const newShifts = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const key = `${data.areaId}-${data.timeSlot}`;
+                    newShifts[key] = data.staffIds || [];
+                });
+                setShifts(newShifts);
+            });
+            unsubscribes.push(unsubscribeShifts);
+
+            const unsubscribeMap = db.collection('layout').doc('floorMap').onSnapshot((doc) => {
+                if (doc.exists) {
+                    setMapLayout(doc.data());
+                }
+            });
+            unsubscribes.push(unsubscribeMap);
+
+            return () => unsubscribes.forEach(unsub => unsub());
+        }, [user]);
+
+        // --- Helper Functions ---
+        const generateTimeSlots = () => {
+            const slots = [];
+            for (let i = timeRange.start; i < timeRange.end; i++) {
+                slots.push(`${String(i).padStart(2, '0')}:00`);
+                slots.push(`${String(i).padStart(2, '0')}:30`);
+            }
+            return slots;
+        };
+        const timeSlots = generateTimeSlots();
+
+        // --- CRUD Operations ---
+        const handleAddOrUpdate = async (collectionName, data, id) => {
+            try {
+                if (id) {
+                    await db.collection(collectionName).doc(id).update(data);
+                } else {
+                    await db.collection(collectionName).add(data);
+                }
+                setModal(null);
+            } catch (err) {
+                console.error(`Error saving to ${collectionName}:`, err);
+            }
+        };
+
+        const handleDelete = async (collectionName, id) => {
+            try {
+                await db.collection(collectionName).doc(id).delete();
+            } catch (err) {
+                console.error(`Error deleting from ${collectionName}:`, err);
+            }
+        };
+
+        const handleShiftUpdate = async (areaId, timeSlot, staffId) => {
+            const shiftKey = `${areaId}-${timeSlot}`;
+            const currentStaffs = shifts[shiftKey] || [];
+            
+            const staff = staffs.find(s => s.id === staffId);
+            if (staff?.ngTimes) {
+                const [slotHour, slotMinute] = timeSlot.split(':').map(Number);
+                const slotTotalMinutes = slotHour * 60 + slotMinute;
+                for (const ng of staff.ngTimes) {
+                    if (!ng?.includes('-')) continue;
+                    const [start, end] = ng.split('-').map(t => t.trim());
+                    if (!start || !end) continue;
+                    const [startH, startM] = start.split(':').map(Number);
+                    const [endH, endM] = end.split(':').map(Number);
+                    const startTotalMinutes = startH * 60 + startM;
+                    const endTotalMinutes = endH * 60 + endM;
+                    if (slotTotalMinutes >= startTotalMinutes && slotTotalMinutes < endTotalMinutes) {
+                        console.warn(`${staff.name}さんはこの時間帯（${ng}）は対応不可です。`);
+                        return;
+                    }
+                }
+            }
+
+            if (!currentStaffs.includes(staffId)) {
+                const newStaffs = [...currentStaffs, staffId];
+                await db.collection('shifts').doc(shiftKey).set({ areaId, timeSlot, staffIds: newStaffs });
+                
+                if (staff?.pair) {
+                    const pairStaff = staffs.find(s => s.id === staff.pair);
+                    if (pairStaff && !newStaffs.includes(pairStaff.id)) {
+                        handleShiftUpdate(areaId, timeSlot, pairStaff.id);
+                    }
+                }
+            }
+        };
+
+        const handleRemoveStaffFromShift = async (areaId, timeSlot, staffId) => {
+            const shiftKey = `${areaId}-${timeSlot}`;
+            const currentStaffs = shifts[shiftKey] || [];
+            const newStaffs = currentStaffs.filter(id => id !== staffId);
+            if (newStaffs.length > 0) {
+                await db.collection('shifts').doc(shiftKey).update({ staffIds: newStaffs });
+            } else {
+                await db.collection('shifts').doc(shiftKey).delete();
+            }
+        };
+
+        // --- Drag and Drop Handlers ---
+        const handleDragStart = (e, item) => { setDraggedItem(item); e.dataTransfer.effectAllowed = 'move'; };
+        const handleDragOver = (e) => e.preventDefault();
+        const handleDrop = (e, areaId, timeSlot) => {
+            e.preventDefault();
+            if (draggedItem?.type === 'staff') {
+                handleShiftUpdate(areaId, timeSlot, draggedItem.id);
+            }
+            setDraggedItem(null);
+        };
+
+        // --- Map Layout Handlers ---
+        const handleMapBackgroundUpload = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const storageRef = storage.ref(`map-backgrounds/${file.name}`);
+            try {
+                await storageRef.put(file);
+                const url = await storageRef.getDownloadURL();
+                await db.collection('layout').doc('floorMap').set({ ...mapLayout, background: url }, { merge: true });
+            } catch (err) {
+                console.error("Error uploading map background:", err);
+            }
+        };
+
+        const handleMapAreaUpdate = async (areaId, position) => {
+            const updatedAreas = { ...mapLayout.areas, [areaId]: position };
+            await db.collection('layout').doc('floorMap').set({ ...mapLayout, areas: updatedAreas }, { merge: true });
+        };
+        
+        // --- UI Components ---
+        const StaffCard = ({ staff }) => (
+            <div draggable onDragStart={(e) => handleDragStart(e, { type: 'staff', ...staff })} className="flex items-center justify-between p-2 mb-2 bg-white rounded-lg shadow-sm cursor-grab active:cursor-grabbing border border-gray-200">
+                <div className="flex items-center min-w-0"><User className="w-5 h-5 mr-3 text-blue-500 flex-shrink-0" /><span className="font-medium text-gray-800 truncate">{staff.name}</span></div>
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                    <button onClick={() => setModal({ type: 'staff', data: staff })} className="text-gray-400 hover:text-blue-600"><Settings className="w-4 h-4" /></button>
+                    <button onClick={() => setModal({ type: 'confirmDelete', collection: 'staffs', id: staff.id, name: staff.name })} className="text-gray-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                </div>
+            </div>
+        );
+
+        const AreaCard = ({ area }) => (
+            <div className="flex items-center justify-between p-2 mb-2 bg-white rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center min-w-0"><MapPin className="w-5 h-5 mr-3 text-green-500 flex-shrink-0" /><span className="font-medium text-gray-800 truncate">{area.name}</span></div>
+                <div className="flex items-center space-x-2 flex-shrink-0">
+                    <button onClick={() => setModal({ type: 'area', data: area })} className="text-gray-400 hover:text-blue-600"><Settings className="w-4 h-4" /></button>
+                    <button onClick={() => setModal({ type: 'confirmDelete', collection: 'areas', id: area.id, name: area.name })} className="text-gray-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                </div>
+            </div>
+        );
+
+        const ModalComponent = () => {
+            if (!modal) return null;
+            
+            if (modal.type === 'confirmDelete') {
+                return (
+                     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                         <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm">
+                             <h2 className="text-lg font-bold text-gray-800 mb-4">削除の確認</h2>
+                             <p className="text-gray-600 mb-6">本当に「{modal.name}」を削除しますか？</p>
+                             <div className="flex justify-end space-x-3">
+                                 <button onClick={() => setModal(null)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">キャンセル</button>
+                                 <button onClick={() => { handleDelete(modal.collection, modal.id); setModal(null); }} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">削除</button>
+                             </div>
+                         </div>
+                     </div>
+                );
+            }
+
+            const [formData, setFormData] = useState(modal.data || {});
+            
+            useEffect(() => {
+                if (modal.type === 'staff' && !modal.data?.ngTimes) setFormData(prev => ({...prev, ngTimes: []}));
+                if (modal.type === 'staff' && !modal.data?.tags) setFormData(prev => ({...prev, tags: []}));
+                if (modal.type === 'area' && !modal.data?.requiredStaff) setFormData(prev => ({...prev, requiredStaff: []}));
+            }, [modal]);
+
+            const handleChange = (e) => setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+            const handleListChange = (listName, index, value) => {
+                const newList = [...(formData[listName] || [])];
+                newList[index] = value;
+                setFormData(prev => ({...prev, [listName]: newList}));
+            };
+            const addToList = (listName, defaultValue) => setFormData(prev => ({...prev, [listName]: [...(prev[listName] || []), defaultValue]}));
+            const removeFromList = (listName, index) => setFormData(prev => ({...prev, [listName]: (prev[listName] || []).filter((_, i) => i !== index)}));
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                handleAddOrUpdate(modal.type === 'staff' ? 'staffs' : 'areas', formData, formData.id);
+            };
+
+            const renderStaffForm = () => (
+                <React.Fragment>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">スタッフ名</label>
+                        <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">ペアリング</label>
+                        <select name="pair" value={formData.pair || ''} onChange={handleChange} className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">ペアなし</option>
+                            {staffs.filter(s => s.id !== formData.id).map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">稼働不可時間</label>
+                        {formData.ngTimes?.map((time, index) => (
+                            <div key={index} className="flex items-center mt-1">
+                                <input type="text" value={time} onChange={(e) => handleListChange('ngTimes', index, e.target.value)} placeholder="HH:MM - HH:MM" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                <button type="button" onClick={() => removeFromList('ngTimes', index)} className="ml-2 text-red-500 hover:text-red-700"><Trash2 size={18}/></button>
+                            </div>
+                        ))}
+                        <button type="button" onClick={() => addToList('ngTimes', '')} className="mt-2 text-sm text-blue-600 hover:underline">不可時間を追加</button>
+                    </div>
+                     <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">スキル・希望タグ</label>
+                        {formData.tags?.map((tag, index) => (
+                            <div key={index} className="flex items-center mt-1">
+                                <input type="text" value={tag} onChange={(e) => handleListChange('tags', index, e.target.value)} placeholder="例: PC操作が得意" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                <button type="button" onClick={() => removeFromList('tags', index)} className="ml-2 text-red-500 hover:text-red-700"><Trash2 size={18}/></button>
+                            </div>
+                        ))}
+                        <button type="button" onClick={() => addToList('tags', '')} className="mt-2 text-sm text-blue-600 hover:underline">タグを追加</button>
+                    </div>
+                </React.Fragment>
+            );
+
+            const renderAreaForm = () => (
+                <React.Fragment>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">エリア名</label>
+                        <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">時間帯別 必要人数</label>
+                        {formData.requiredStaff?.map((req, index) => (
+                            <div key={index} className="grid grid-cols-3 gap-2 items-center mt-1">
+                                <input type="text" value={req.time || ''} onChange={(e) => handleListChange('requiredStaff', index, {...req, time: e.target.value})} placeholder="HH:MM - HH:MM" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                <input type="number" min="1" value={req.count || 1} onChange={(e) => handleListChange('requiredStaff', index, {...req, count: e.target.value})} placeholder="人数" className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm" />
+                                <button type="button" onClick={() => removeFromList('requiredStaff', index)} className="ml-2 text-red-500 hover:text-red-700"><Trash2 size={18}/></button>
+                            </div>
+                        ))}
+                        <button type="button" onClick={() => addToList('requiredStaff', {time: '', count: 1})} className="mt-2 text-sm text-blue-600 hover:underline">時間帯を追加</button>
+                    </div>
+                </React.Fragment>
+            );
+
+            return (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+                        <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold text-gray-800">{modal.type === 'staff' ? 'スタッフ情報' : 'エリア情報'}</h2><button onClick={() => setModal(null)} className="text-gray-500 hover:text-gray-800"><X /></button></div>
+                        <form onSubmit={handleSubmit}>
+                            {modal.type === 'staff' ? renderStaffForm() : renderAreaForm()}
+                            <div className="mt-6 flex justify-end space-x-3">
+                                <button type="button" onClick={() => setModal(null)} className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300">キャンセル</button>
+                                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center"><Save size={16} className="mr-2"/> 保存</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        const ShiftCell = ({ area, timeSlot }) => {
+            const shiftKey = `${area.id}-${timeSlot}`;
+            const assignedStaffIds = shifts[shiftKey] || [];
+            const assignedStaffs = assignedStaffIds.map(id => staffs.find(s => s.id === id)).filter(Boolean);
+
+            const getRequiredCount = () => {
+                if (!area.requiredStaff) return 0;
+                const [slotHour, slotMinute] = timeSlot.split(':').map(Number);
+                const slotTotalMinutes = slotHour * 60 + slotMinute;
+                for (const req of area.requiredStaff) {
+                    if (!req.time?.includes('-')) continue;
+                    const [start, end] = req.time.split('-').map(t => t.trim());
+                    if (!start || !end) continue;
+                    const [startH, startM] = start.split(':').map(Number);
+                    const [endH, endM] = end.split(':').map(Number);
+                    if (slotTotalMinutes >= (startH * 60 + startM) && slotTotalMinutes < (endH * 60 + endM)) {
+                        return parseInt(req.count) || 0;
+                    }
+                }
+                return 0;
+            };
+
+            const requiredCount = getRequiredCount();
+            const isDeficient = requiredCount > 0 && assignedStaffs.length < requiredCount;
+
+            return (
+                <td onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, area.id, timeSlot)} className={`border border-gray-200 p-1 h-24 text-xs relative ${isDeficient ? 'bg-red-100' : 'bg-white'}`}>
+                    {isDeficient && <div className="absolute top-1 right-1 text-red-500" title={`人員不足: ${assignedStaffs.length}/${requiredCount}人`}><AlertTriangle size={14} /></div>}
+                    <div className="flex flex-wrap gap-1">
+                        {assignedStaffs.map(staff => (
+                            <div key={staff.id} className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full flex items-center">
+                                <span>{staff.name}</span>
+                                <button onClick={() => handleRemoveStaffFromShift(area.id, timeSlot, staff.id)} className="ml-1 text-blue-500 hover:text-blue-800"><X size={12} /></button>
+                            </div>
+                        ))}
+                    </div>
+                </td>
+            );
+        };
+        
+        const MapArea = ({ area, layout, onUpdate }) => {
+            const ref = useRef(null);
+            const handleDragAndResize = (e, type) => {
+                e.preventDefault();
+                const el = ref.current;
+                const parent = el.parentElement;
+                const startX = e.clientX;
+                const startY = e.clientY;
+                const startLeft = el.offsetLeft;
+                const startTop = el.offsetTop;
+                const startWidth = el.offsetWidth;
+                const startHeight = el.offsetHeight;
+
+                const handleMouseMove = (moveEvent) => {
+                    const dx = moveEvent.clientX - startX;
+                    const dy = moveEvent.clientY - startY;
+                    if (type === 'drag') {
+                        el.style.left = `${Math.max(0, Math.min(startLeft + dx, parent.offsetWidth - el.offsetWidth))}px`;
+                        el.style.top = `${Math.max(0, Math.min(startTop + dy, parent.offsetHeight - el.offsetHeight))}px`;
+                    } else { // resize
+                        el.style.width = `${Math.max(50, startWidth + dx)}px`;
+                        el.style.height = `${Math.max(50, startHeight + dy)}px`;
+                    }
+                };
+
+                const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    onUpdate(area.id, { x: el.offsetLeft, y: el.offsetTop, width: el.offsetWidth, height: el.offsetHeight });
+                };
+                
+                document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('mouseup', handleMouseUp);
+            };
+
+            const timelineHour = Math.floor(mapTimelineValue / 60);
+            const timelineMinute = mapTimelineValue % 60;
+            const timeSlot = `${String(timelineHour).padStart(2, '0')}:${String(Math.floor(timelineMinute / 30) * 30).padStart(2, '0')}`;
+            const shiftKey = `${area.id}-${timeSlot}`;
+            const assignedStaffs = (shifts[shiftKey] || []).map(id => staffs.find(s => s.id === id)).filter(Boolean);
+
+            return (
+                <div ref={ref} onMouseDown={(e) => handleDragAndResize(e, 'drag')} className="absolute bg-blue-500 bg-opacity-30 border-2 border-blue-600 rounded-lg flex flex-col justify-center items-center cursor-move" style={{ left: `${layout.x}px`, top: `${layout.y}px`, width: `${layout.width}px`, height: `${layout.height}px` }}>
+                    <div className="font-bold text-white text-center p-2" style={{textShadow: '1px 1px 2px black'}}>{area.name}</div>
+                    <div className="flex flex-wrap justify-center gap-1 p-1">
+                        {assignedStaffs.map(staff => <div key={staff.id} className="bg-white text-blue-800 text-xs px-2 py-1 rounded-full shadow-md flex items-center gap-1"><User size={12} /> {staff.name}</div>)}
+                    </div>
+                    <div onMouseDown={(e) => { e.stopPropagation(); handleDragAndResize(e, 'resize'); }} className="resize-handle absolute bottom-0 right-0 w-4 h-4 bg-blue-800 cursor-se-resize" />
+                </div>
+            );
+        };
+
+        if (isLoading) return <div className="flex items-center justify-center h-screen text-blue-600">読み込み中...</div>;
+        if (error) return <div className="flex items-center justify-center h-screen bg-red-50 text-red-700 p-8"><div className="text-center"><AlertTriangle className="mx-auto h-12 w-12 text-red-400" /><h3 className="mt-2 text-lg font-medium text-red-800">エラーが発生しました</h3><p className="mt-2 text-sm">{error}</p></div></div>;
+
+        // --- Main Render ---
+        return (
+            <div className="flex h-screen font-sans">
+                {modal && <ModalComponent />}
+                <aside className="w-80 bg-white border-r border-gray-200 flex flex-col p-4">
+                    <h1 className="text-2xl font-bold text-blue-600 mb-6">シフト管理アプリ</h1>
+                    <div className="mb-6"><h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center"><Users className="mr-2"/>スタッフ管理</h2><div className="max-h-60 overflow-y-auto pr-2">{staffs.map(staff => <StaffCard key={staff.id} staff={staff} />)}</div><button onClick={() => setModal({ type: 'staff' })} className="mt-2 w-full flex items-center justify-center py-2 px-4 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md text-sm font-medium"><Plus className="w-4 h-4 mr-2" />スタッフを追加</button></div>
+                    <div className="mb-6"><h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center"><MapPin className="mr-2"/>エリア管理</h2><div className="max-h-60 overflow-y-auto pr-2">{areas.map(area => <AreaCard key={area.id} area={area} />)}</div><button onClick={() => setModal({ type: 'area' })} className="mt-2 w-full flex items-center justify-center py-2 px-4 bg-green-50 hover:bg-green-100 text-green-700 rounded-md text-sm font-medium"><Plus className="w-4 h-4 mr-2" />エリアを追加</button></div>
+                    <div className="mt-auto"><button onClick={() => navigator.clipboard.writeText(window.location.href)} className="w-full flex items-center justify-center py-2 px-4 bg-gray-600 hover:bg-gray-700 text-white rounded-md text-sm font-medium"><Share2 className="w-4 h-4 mr-2" />共有リンクをコピー</button></div>
+                </aside>
+                <main className="flex-1 flex flex-col">
+                    <header className="bg-white border-b border-gray-200 p-4 flex justify-between items-center">
+                        <div className="flex items-center space-x-2"><button onClick={() => setActiveTab('shift-table')} className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'shift-table' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>シフト表</button><button onClick={() => setActiveTab('floor-map')} className={`px-4 py-2 rounded-md text-sm font-medium ${activeTab === 'floor-map' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}>フロアマップ</button></div>
+                        <div className="flex items-center space-x-4"><button className="flex items-center text-sm text-gray-600 hover:text-blue-600"><Wand2 className="mr-2"/>AIで自動割り当て (開発中)</button></div>
+                    </header>
+                    <div className="flex-1 overflow-auto p-6">
+                        {activeTab === 'shift-table' && <div className="overflow-x-auto"><table className="w-full border-collapse"><thead><tr><th className="sticky left-0 bg-gray-100 border border-gray-200 p-2 font-semibold text-sm z-10">エリア</th>{timeSlots.map(time => <th key={time} className="border border-gray-200 p-2 font-semibold text-sm min-w-[80px]">{time}</th>)}</tr></thead><tbody>{areas.map(area => <tr key={area.id}><td className="sticky left-0 bg-gray-50 border border-gray-200 p-2 font-semibold text-sm z-10">{area.name}</td>{timeSlots.map(time => <ShiftCell key={time} area={area} timeSlot={time} />)}</tr>)}</tbody></table></div>}
+                        {activeTab === 'floor-map' && <div className="flex flex-col h-full"><div className="mb-4 flex items-center justify-between"><h3 className="text-xl font-semibold">フロアマップ</h3><label className="flex items-center cursor-pointer py-2 px-4 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"><ImageIcon size={16} className="mr-2" />背景画像をアップロード<input type="file" className="hidden" accept="image/png, image/jpeg" onChange={handleMapBackgroundUpload} /></label></div><div className="relative flex-1 bg-gray-200 rounded-lg overflow-hidden" style={{ backgroundImage: `url(${mapLayout.background})`, backgroundSize: 'contain', backgroundRepeat: 'no-repeat', backgroundPosition: 'center' }}>{areas.map(area => <MapArea key={area.id} area={area} layout={mapLayout.areas?.[area.id] || { x: 50, y: 50, width: 150, height: 100 }} onUpdate={handleMapAreaUpdate} />)}</div><div className="mt-4 p-4 bg-white rounded-lg shadow-md"><label htmlFor="timeline" className="block text-sm font-medium text-gray-700 mb-2">タイムライン: {`${String(Math.floor(mapTimelineValue / 60)).padStart(2, '0')}:${String(mapTimelineValue % 60).padStart(2, '0')}`}</label><input id="timeline" type="range" min={timeRange.start * 60} max={timeRange.end * 60 - 30} step="30" value={mapTimelineValue} onChange={(e) => setMapTimelineValue(parseInt(e.target.value))} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" /></div></div>}
+                    </div>
+                </main>
+            </div>
+        );
+    }
+
+    // --- Render the App ---
+    const container = document.getElementById('root');
+    const root = ReactDOM.createRoot(container);
+    root.render(<App />);
+    </script>
+</body>
+</html>
