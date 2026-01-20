@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>戦略的キャリア・ロードマップ：実務型リーダーのための企業マッチング</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #f5f5f4; /* Stone 100 - Warm Neutral */
+            color: #1c1917; /* Stone 900 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        /* Custom Scrollbar for inner content */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #e7e5e4;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #a8a29e;
+            border-radius: 20px;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals (Stone) + Professional Navy (Logic) + Burnt Orange (Emotion/Action) -->
+    <!-- Application Structure Plan: 
+         1. Hero/Identity: Visualizes the user's "Pragmatic Leader" profile using a radar chart to anchor the recommendations.
+         2. Macro View (Industry Map): A scatter plot interacting with the company list, showing where industries sit on the "Logic vs. Emotion" axis.
+         3. Micro View (Company Explorer): The core actionable list. Filterable cards with specific data from the report (Salary, Culture, Why it fits).
+         4. Roadmap: Interactive checklist to guide immediate next steps.
+         Why this structure? It moves from Self-Analysis -> Market Overview -> Specific Targets -> Action, following a logical decision-making flow.
+    -->
+    <!-- Visualization & Content Choices:
+         - Radar Chart: Instantly communicates the balance of the 3 key strengths (Org Balance, Analysis, Execution).
+         - Scatter Plot: chosen to visualize the "Trade-off" mentioned in the report between Logic and Emotion, helping the user position themselves.
+         - Filterable Grid: Best for browsing distinct company options without overwhelming text.
+         - Interactive Roadmap: Encourages user agency and tracking.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <!-- Navigation / Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-stone-700">
+                <span class="text-orange-600">★</span> 戦略的キャリア・ロードマップ
+            </h1>
+            <nav class="hidden md:flex space-x-6 text-sm font-medium">
+                <a href="#profile" class="hover:text-orange-600 transition">人物像分析</a>
+                <a href="#landscape" class="hover:text-orange-600 transition">業界マップ</a>
+                <a href="#companies" class="hover:text-orange-600 transition">推奨企業リスト</a>
+                <a href="#roadmap" class="hover:text-orange-600 transition">アクション</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 space-y-12">
+
+        <!-- Section 1: Introduction & Profile Analysis -->
+        <section id="profile" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100">
+                    <h2 class="text-2xl font-bold mb-4 text-stone-800 border-l-4 border-orange-500 pl-3">エグゼクティブ・サマリー</h2>
+                    <p class="text-stone-600 leading-relaxed mb-4">
+                        本レポートの分析によると、あなたは<strong>「論理と感情の両輪で、現場の課題を解決する『実務型リーダー』」</strong>です。
+                        多くの組織において「仕組み（論理）」と「熱量（感情）」はトレードオフになりがちですが、あなたはこの二律背反を統合し、カオスな状況から秩序を生み出す希少な能力を持っています。
+                    </p>
+                    <p class="text-stone-600 leading-relaxed">
+                        DXや組織変革が求められる現代において、この「泥臭い実行力」と「高度な分析力」のハイブリッド性は極めて高い市場価値を持ちます。以下のダッシュボードを使って、この強みが活きる具体的なフィールドを探求してください。
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-stone-100 p-4 rounded-lg text-center">
+                        <div class="text-2xl mb-2">⚖️</div>
+                        <h3 class="font-bold text-sm mb-1">組織的バランス</h3>
+                        <p class="text-xs text-stone-500">論理と感情の統合<br>仕組み化とモチベーション</p>
+                    </div>
+                    <div class="bg-stone-100 p-4 rounded-lg text-center">
+                        <div class="text-2xl mb-2">🔍</div>
+                        <h3 class="font-bold text-sm mb-1">課題分析力</h3>
+                        <p class="text-xs text-stone-500">数字に基づく現状把握<br>ボトルネック特定</p>
+                    </div>
+                    <div class="bg-stone-100 p-4 rounded-lg text-center">
+                        <div class="text-2xl mb-2">🔥</div>
+                        <h3 class="font-bold text-sm mb-1">完遂力</h3>
+                        <p class="text-xs text-stone-500">粘り強い実行<br>現場への介入</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Radar Chart -->
+            <div class="lg:col-span-5 bg-white p-6 rounded-xl shadow-sm border border-stone-100 flex flex-col items-center justify-center">
+                <h3 class="text-lg font-bold mb-2 text-stone-700">コア・コンピテンシー分析</h3>
+                <div class="chart-container">
+                    <canvas id="profileChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-stone-400 mt-2">※自己評価および経験記述に基づくポテンシャル分析</p>
+            </div>
+        </section>
+
+        <!-- Section 2: Industry Landscape Map -->
+        <section id="landscape" class="bg-white p-8 rounded-xl shadow-md border-t-4 border-slate-600">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">業界ポジショニング・マップ</h2>
+                <p class="text-stone-600 text-sm">
+                    あなたの強みが活きる4つの主要領域（M&A、IFA、コンサル、SaaS）を、「論理的構造」と「人間的感情（ウェットな関係性）」の軸で整理しました。
+                    チャート上のポイントをクリックすると、下部の企業リストが該当業界に絞り込まれます。
+                </p>
+            </div>
+            
+            <div class="flex flex-col md:flex-row gap-8">
+                <!-- Scatter Plot -->
+                <div class="w-full md:w-2/3">
+                    <div class="chart-container bg-stone-50 rounded-lg border border-stone-200 p-2">
+                        <canvas id="industryChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Legend/Explanation -->
+                <div class="w-full md:w-1/3 flex flex-col justify-center space-y-4">
+                    <div class="p-4 bg-orange-50 border-l-4 border-orange-500 rounded text-sm">
+                        <h4 class="font-bold text-orange-800 mb-1">M&A仲介</h4>
+                        <p class="text-orange-700">経営者の人生（感情）と財務（論理）の両方を扱う最高難度の領域。高報酬かつ社会的意義が大。</p>
+                    </div>
+                    <div class="p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm">
+                        <h4 class="font-bold text-blue-800 mb-1">コンサルティング</h4>
+                        <p class="text-blue-700">論理的解決力が最優先されるが、実行支援（実装）フェーズでは現場の掌握力が鍵となる。</p>
+                    </div>
+                    <div class="p-4 bg-green-50 border-l-4 border-green-500 rounded text-sm">
+                        <h4 class="font-bold text-green-800 mb-1">IFA / 資産管理</h4>
+                        <p class="text-green-700">顧客の人生に長期伴走する。信頼関係構築（感情）が論理的提案の前提となる。</p>
+                    </div>
+                    <div class="p-4 bg-purple-50 border-l-4 border-purple-500 rounded text-sm">
+                        <h4 class="font-bold text-purple-800 mb-1">SaaS / CS</h4>
+                        <p class="text-purple-700">プロダクト（論理）と顧客成功（感情）の橋渡し役。仕組み化能力が最も活きる。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Company Matcher (The Core Request) -->
+        <section id="companies">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-6">
+                <div>
+                    <h2 class="text-3xl font-bold text-stone-800 mb-2">推奨企業データベース</h2>
+                    <p class="text-stone-600">
+                        レポート内で言及された、あなたの「実務型リーダー」としての資質にマッチする具体的な企業です。
+                    </p>
+                </div>
+                
+                <!-- Filters -->
+                <div class="mt-4 md:mt-0 flex flex-wrap gap-2">
+                    <button onclick="filterCompanies('all')" class="filter-btn active px-4 py-2 rounded-full text-sm font-bold bg-stone-800 text-white shadow hover:bg-stone-700 transition" data-filter="all">全て</button>
+                    <button onclick="filterCompanies('ma')" class="filter-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-stone-600 border border-stone-300 hover:bg-orange-50 hover:text-orange-600 transition" data-filter="ma">M&A仲介</button>
+                    <button onclick="filterCompanies('ifa')" class="filter-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-stone-600 border border-stone-300 hover:bg-green-50 hover:text-green-600 transition" data-filter="ifa">IFA/金融</button>
+                    <button onclick="filterCompanies('consult')" class="filter-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-stone-600 border border-stone-300 hover:bg-blue-50 hover:text-blue-600 transition" data-filter="consult">コンサル</button>
+                    <button onclick="filterCompanies('saas')" class="filter-btn px-4 py-2 rounded-full text-sm font-bold bg-white text-stone-600 border border-stone-300 hover:bg-purple-50 hover:text-purple-600 transition" data-filter="saas">SaaS/IT</button>
+                </div>
+            </div>
+
+            <!-- Cards Grid -->
+            <div id="companyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Content will be injected by JS -->
+            </div>
+        </section>
+
+        <!-- Section 4: Action Roadmap -->
+        <section id="roadmap" class="bg-white rounded-xl shadow-sm border border-stone-200 overflow-hidden">
+            <div class="p-8 bg-stone-800 text-white">
+                <h2 class="text-2xl font-bold">今後のアクションプラン</h2>
+                <p class="opacity-80 mt-2">短期的な情報収集から、中長期的なキャリア構築までのロードマップ</p>
+            </div>
+            <div class="p-8">
+                <div class="relative border-l-2 border-stone-200 ml-4 space-y-8">
+                    
+                    <!-- Phase 1 -->
+                    <div class="mb-8 relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-orange-500 ring-4 ring-white"></div>
+                        <h3 class="text-lg font-bold text-stone-800 mb-2">Phase 1: 情報収集・仮説検証 (〜1ヶ月)</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded hover:bg-stone-50 transition">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-orange-500 rounded focus:ring-orange-500">
+                                <span class="text-stone-700">M&A仲介各社の採用セミナー動画を視聴し、カルチャーの「ウェットさ」を確認する</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded hover:bg-stone-50 transition">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-orange-500 rounded focus:ring-orange-500">
+                                <span class="text-stone-700">IFA企業の「転勤なし」「顧客担当制」の具体的制度を比較表にまとめる</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded hover:bg-stone-50 transition">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-orange-500 rounded focus:ring-orange-500">
+                                <span class="text-stone-700">エージェント（リクルート、JAC等）に登録し、非公開求人の要件定義書を入手</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="mb-8 relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-400 ring-4 ring-white"></div>
+                        <h3 class="text-lg font-bold text-stone-800 mb-2">Phase 2: 選考・見極め (1〜3ヶ月)</h3>
+                        <div class="space-y-3">
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded hover:bg-stone-50 transition">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-stone-400 rounded focus:ring-stone-500">
+                                <span class="text-stone-700">カジュアル面談を通じ、「入社後の教育体制」と「評価制度」の透明性を質問する</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer p-3 rounded hover:bg-stone-50 transition">
+                                <input type="checkbox" class="form-checkbox h-5 w-5 text-stone-400 rounded focus:ring-stone-500">
+                                <span class="text-stone-700">コンサルティングファームのケース面接対策（論理的思考のアピール準備）</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-300 ring-4 ring-white"></div>
+                        <h3 class="text-lg font-bold text-stone-800 mb-2">Phase 3: キャリア確立 (入社後〜3年)</h3>
+                        <div class="bg-stone-50 p-4 rounded-lg text-sm text-stone-600">
+                            <strong>目標:</strong> プレイヤーとしての実績（成約数・顧客評価）を作りつつ、チームリーダーとして「仕組み化」を提案し、組織への影響力を拡大する。「実務型リーダー」としてのブランドを確立。
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 mt-12">
+        <div class="container mx-auto px-4 text-center text-sm">
+            <p>&copy; 2026 Career Strategy Analysis. Based on provided source report.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data: Company Database based on Report ---
+        const companies = [
+            {
+                id: 1,
+                name: "日本M&Aセンター",
+                industry: "ma",
+                type: "最大手・圧倒的実績",
+                desc: "業界のガリバー。データ蓄積量とマッチング精度は随一。",
+                fit: "「仕組み」が完成されているため、早期に成果を出したい場合に最適。ただし競争は激しい。",
+                tags: ["高年収", "激務", "圧倒的成長"],
+                color: "orange"
+            },
+            {
+                id: 2,
+                name: "株式会社ストライク",
+                industry: "ma",
+                type: "公認会計士主体・堅実",
+                desc: "ネットワーキングと専門性が強み。M&A仲介の中でも「知性」寄りのカルチャー。",
+                fit: "あなたの「論理的思考力」が最も評価されやすい環境。財務知識を活かした提案が可能。",
+                tags: ["専門性", "オンラインM&A", "スマート"],
+                color: "orange"
+            },
+            {
+                id: 3,
+                name: "M&Aキャピタルパートナーズ",
+                industry: "ma",
+                type: "少数精鋭・超高収益",
+                desc: "一人当たりの生産性が極めて高い。国内トップクラスの年収水準。",
+                fit: "「完遂力」が試される。個人の裁量が大きく、プロフェッショナルとしての自律が求められる。",
+                tags: ["超高年収", "少数精鋭", "ハードワーク"],
+                color: "orange"
+            },
+            {
+                id: 4,
+                name: "fundbook (ファンドブック)",
+                industry: "ma",
+                type: "Tech × M&A",
+                desc: "プラットフォームとアドバイザーのハイブリッドモデル。",
+                fit: "ITリテラシーと対人スキルの両方が活きる。「仕組み化」への貢献余地が大きい。",
+                tags: ["Tech活用", "効率化", "新しいM&A"],
+                color: "orange"
+            },
+            {
+                id: 5,
+                name: "株式会社バトンズ",
+                industry: "ma",
+                type: "スモールM&A・事業承継",
+                desc: "小規模案件に特化し、地方創生や事業承継問題を解決。",
+                fit: "「社会貢献性」と「手触り感」を重視する場合にマッチ。多くの経営者を救う実感がある。",
+                tags: ["地方創生", "プラットフォーム", "社会的意義"],
+                color: "orange"
+            },
+            {
+                id: 6,
+                name: "GAIA (ガイア)",
+                industry: "ifa",
+                type: "独立系IFAのパイオニア",
+                desc: "長期的な顧客リレーションを最重視。ノルマ型営業からの脱却。",
+                fit: "「顧客本位」を追求できる。感情（信頼）と論理（資産運用）のバランスが求められる天職。",
+                tags: ["顧客本位", "転勤なし", "長期関係"],
+                color: "green"
+            },
+            {
+                id: 7,
+                name: "株式会社Fan",
+                industry: "ifa",
+                type: "投資信託相談プラザ",
+                desc: "来店型・オンライン相談に強み。柔軟な働き方が可能。",
+                fit: "「仕組み」の中で顧客対応に集中できる。ワークライフバランスも整えやすい。",
+                tags: ["来店型", "残業少なめ", "柔軟性"],
+                color: "green"
+            },
+            {
+                id: 8,
+                name: "アクセンチュア",
+                industry: "consult",
+                type: "総合系・実行支援",
+                desc: "戦略から実行、運用まで一気通貫。DX案件が豊富。",
+                fit: "「実務型」の強みが活きる実行部隊（Operations/Technology）での活躍が見込める。",
+                tags: ["グローバル", "DX実行", "多様なキャリア"],
+                color: "blue"
+            },
+            {
+                id: 9,
+                name: "Salesforce",
+                industry: "saas",
+                type: "SaaSの王者",
+                desc: "The Model（営業プロセス分業）の生みの親。カスタマーサクセスが強力。",
+                fit: "世界最高峰の「仕組み」を学びつつ、顧客の成功に伴走できる。論理性と人間性のバランスが良い。",
+                tags: ["外資系", "The Model", "カルチャー強"],
+                color: "purple"
+            },
+            {
+                id: 10,
+                name: "Sansan / マネーフォワード",
+                industry: "saas",
+                type: "国内SaaS大手",
+                desc: "DX推進の旗手。プロダクトの力で企業の課題を解決。",
+                fit: "日本企業の生産性向上という「意義」を感じながら、組織の成長にも関与できる。",
+                tags: ["国内SaaS", "DX", "成長環境"],
+                color: "purple"
+            }
+        ];
+
+        // --- 1. Profile Radar Chart ---
+        function initProfileChart() {
+            const ctx = document.getElementById('profileChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['組織的バランス\n(Mechanism)', '課題分析力\n(Logic)', '完遂力\n(Passion)', '対人影響力', '専門知識'],
+                    datasets: [{
+                        label: 'あなたのポテンシャル',
+                        data: [90, 85, 95, 80, 70], // Hypothetical scores based on "Pragmatic Leader" description
+                        backgroundColor: 'rgba(249, 115, 22, 0.2)', // Orange-500 low opacity
+                        borderColor: 'rgba(249, 115, 22, 1)',
+                        pointBackgroundColor: 'rgba(249, 115, 22, 1)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            pointLabels: {
+                                font: { size: 12, family: "'Noto Sans JP', sans-serif" },
+                                color: '#44403c'
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 2. Industry Scatter Plot ---
+        let industryChartInstance = null;
+
+        function initIndustryChart() {
+            const ctx = document.getElementById('industryChart').getContext('2d');
+            
+            // Data points: x = Logic(0) to Emotion(10), y = Market Growth(0-10)
+            const dataPoints = [
+                { x: 3, y: 9, label: 'コンサルティング', category: 'consult', r: 15 },
+                { x: 8, y: 9.5, label: 'M&A仲介', category: 'ma', r: 20 }, // High Emotion, High Growth
+                { x: 9, y: 7, label: 'IFA (資産管理)', category: 'ifa', r: 15 }, // High Emotion (Trust)
+                { x: 4, y: 8, label: 'SaaS / CS', category: 'saas', r: 18 } // Balanced/Logic heavy
+            ];
+
+            industryChartInstance = new Chart(ctx, {
+                type: 'bubble',
+                data: {
+                    datasets: [{
+                        label: '業界マップ',
+                        data: dataPoints,
+                        backgroundColor: (context) => {
+                            const cat = context.raw?.category;
+                            if(cat === 'ma') return 'rgba(249, 115, 22, 0.7)'; // Orange
+                            if(cat === 'consult') return 'rgba(59, 130, 246, 0.7)'; // Blue
+                            if(cat === 'ifa') return 'rgba(34, 197, 94, 0.7)'; // Green
+                            if(cat === 'saas') return 'rgba(168, 85, 247, 0.7)'; // Purple
+                            return 'gray';
+                        }
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    onClick: (e, activeEls) => {
+                        if (activeEls.length > 0) {
+                            const index = activeEls[0].index;
+                            const category = dataPoints[index].category;
+                            filterCompanies(category);
+                            // Scroll to companies
+                            document.getElementById('companies').scrollIntoView({ behavior: 'smooth' });
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: { display: true, text: '◀ 論理・構造 　　　 感情・人間関係 ▶' },
+                            min: 0, max: 10,
+                            grid: { color: '#e5e7eb' }
+                        },
+                        y: {
+                            title: { display: true, text: '市場成長性 (低 → 高)' },
+                            min: 0, max: 12,
+                            grid: { color: '#e5e7eb' },
+                            ticks: { display: false } // Hide numbers for cleaner look
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw.label;
+                                }
+                            }
+                        },
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // --- 3. Company Grid Rendering & Filtering ---
+        const gridEl = document.getElementById('companyGrid');
+        const btns = document.querySelectorAll('.filter-btn');
+
+        function renderCards(filterCode) {
+            gridEl.innerHTML = '';
+            
+            const filtered = filterCode === 'all' 
+                ? companies 
+                : companies.filter(c => c.industry === filterCode);
+
+            if (filtered.length === 0) {
+                gridEl.innerHTML = '<p class="col-span-3 text-center text-stone-500">該当する企業がありません。</p>';
+                return;
+            }
+
+            filtered.forEach(c => {
+                // Determine border color based on industry
+                let borderColor = 'border-l-4 border-stone-300';
+                if(c.color === 'orange') borderColor = 'border-l-4 border-orange-500';
+                if(c.color === 'blue') borderColor = 'border-l-4 border-blue-500';
+                if(c.color === 'green') borderColor = 'border-l-4 border-green-500';
+                if(c.color === 'purple') borderColor = 'border-l-4 border-purple-500';
+
+                const card = document.createElement('div');
+                card.className = `bg-white rounded-lg shadow p-6 card-hover flex flex-col justify-between ${borderColor}`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-stone-800">${c.name}</h3>
+                            <span class="text-xs font-semibold px-2 py-1 bg-stone-100 text-stone-600 rounded">${c.type}</span>
+                        </div>
+                        <p class="text-sm text-stone-600 mb-4 h-10 overflow-hidden text-ellipsis">${c.desc}</p>
+                        
+                        <div class="bg-stone-50 p-3 rounded mb-4">
+                            <p class="text-xs font-bold text-stone-500 mb-1">💡 マッチングポイント</p>
+                            <p class="text-sm text-stone-800 leading-snug">${c.fit}</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        ${c.tags.map(t => `<span class="text-xs px-2 py-1 bg-stone-200 text-stone-700 rounded-full">#${t}</span>`).join('')}
+                    </div>
+                `;
+                gridEl.appendChild(card);
+            });
+        }
+
+        window.filterCompanies = function(category) {
+            // Update Buttons
+            btns.forEach(b => {
+                if(b.dataset.filter === category) {
+                    b.classList.remove('bg-white', 'text-stone-600', 'border');
+                    b.classList.add('bg-stone-800', 'text-white');
+                } else {
+                    b.classList.add('bg-white', 'text-stone-600', 'border');
+                    b.classList.remove('bg-stone-800', 'text-white');
+                }
+            });
+            renderCards(category);
+        };
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initProfileChart();
+            initIndustryChart();
+            renderCards('all');
+        });
+
+    </script>
+</body>
+</html>

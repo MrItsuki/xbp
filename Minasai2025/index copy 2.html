@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTO 2024 活動振り返りレポート</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-slow {
+            animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        /* Hide scrollbar for tab navigation */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* Tab transition styles */
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background-color: white;
+            color: #047857; /* emerald-700 */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+            --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+            box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+            --tw-ring-color: rgba(16, 185, 129, 0.2); /* emerald-500/20 */
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-green-100 selection:text-green-800">
+
+    <!-- Hero Section -->
+    <header class="bg-gradient-to-br from-emerald-800 to-green-600 text-white pb-24 pt-16 px-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
+            <i data-lucide="recycle" width="400" height="400"></i>
+        </div>
+        <div class="max-w-4xl mx-auto relative z-10">
+            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium mb-4 border border-white/30">
+                <span class="w-2 h-2 rounded-full bg-green-300 animate-pulse"></span>
+                FY2024 Retrospective
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold mb-4 tracking-tight leading-tight">
+                GTO 2024<br />活動振り返りレポート
+            </h1>
+            <p class="text-xl md:text-2xl text-green-50 font-light max-w-2xl leading-relaxed">
+                ゴミ分別のその先へ。<br />
+                成果と課題、そして次年度への提言。
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-6 -mt-16 relative z-20 pb-20">
+        
+        <!-- Navigation Tabs -->
+        <div class="flex gap-2 overflow-x-auto pb-4 mb-4 scrollbar-hide">
+            <button onclick="switchTab('summary')" id="btn-summary" class="tab-btn active px-6 py-3 rounded-xl font-bold text-sm whitespace-nowrap bg-white text-emerald-700 shadow-md ring-2 ring-emerald-500/20">
+                🏆 今年のハイライト
+            </button>
+            <button onclick="switchTab('details')" id="btn-details" class="tab-btn px-6 py-3 rounded-xl font-bold text-sm whitespace-nowrap bg-white/60 text-slate-500 hover:bg-white hover:text-emerald-600">
+                🔍 課題・改善詳細
+            </button>
+            <button onclick="switchTab('guidelines')" id="btn-guidelines" class="tab-btn px-6 py-3 rounded-xl font-bold text-sm whitespace-nowrap bg-white/60 text-slate-500 hover:bg-white hover:text-emerald-600">
+                📋 次年度ガイドライン案
+            </button>
+            <button onclick="switchTab('future')" id="btn-future" class="tab-btn px-6 py-3 rounded-xl font-bold text-sm whitespace-nowrap bg-white/60 text-slate-500 hover:bg-white hover:text-emerald-600">
+                🚀 次年度の組織論
+            </button>
+        </div>
+
+        <!-- Tab Content: SUMMARY -->
+        <div id="summary" class="tab-content active animate-fadeIn">
+            <div class="space-y-8">
+                
+                <!-- Achievements Cards -->
+                <div class="grid md:grid-cols-3 gap-4">
+                    <!-- Card 1 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div class="bg-slate-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-blue-600">
+                            <i data-lucide="clock" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">撤収スピードの向上</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">昨年度よりもスピーディーな片付けを実現。自律的な動きがカギ。</p>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div class="bg-slate-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-green-600">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">分別の意識改革</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">GTOの独立稼働により、参加団体・来場者の分別意識が高まった。</p>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                        <div class="bg-slate-50 w-12 h-12 rounded-full flex items-center justify-center mb-4 text-orange-600">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">主体的解決力</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">予想外の事態にも、各自が積極的に解決しようとする姿勢が見られた。</p>
+                    </div>
+                </div>
+
+                <!-- Voices Section -->
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-orange-400"></div>
+                    <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                        <i data-lucide="heart" class="text-pink-500"></i> チームメンバーの声
+                    </h2>
+                    <div class="grid gap-6">
+                        <div class="bg-slate-50 p-5 rounded-xl border-l-4 border-emerald-400 relative">
+                            <p class="text-slate-700 italic mb-3 font-medium">"いつきとももか本当にお疲れ様！！！！2人が立ち上がってくれたから、今年本当に片付けが早かったし、全体の意識も大きく変わったと思う！！！"</p>
+                            <div class="flex items-center justify-end text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                メンバーの声
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-xl border-l-4 border-emerald-400 relative">
+                            <p class="text-slate-700 italic mb-3 font-medium">"初めての試みだったこともあり、効率よく運営できていたかというと正直微妙だったかも。でも、今年の反省点をしっかり振り返ることが一番の改善につながる。"</p>
+                            <div class="flex items-center justify-end text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                振り返り
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-xl border-l-4 border-emerald-400 relative">
+                            <p class="text-slate-700 italic mb-3 font-medium">"今回は燃えないゴミの排出がほとんどなかった。基本的には分別されていたため、非常に良かった。"</p>
+                            <div class="flex items-center justify-end text-xs font-bold text-slate-400 uppercase tracking-wider">
+                                現場の声
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: DETAILS -->
+        <div id="details" class="tab-content animate-fadeIn">
+            <div class="space-y-6">
+                <!-- Case Study 1: Education -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="bg-amber-50 p-4 border-b border-amber-100 flex items-center gap-3">
+                        <div class="bg-amber-100 p-2 rounded-lg text-amber-700">
+                            <i data-lucide="book-open" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">CASE 1: マニュアルの形骸化と特殊ゴミ</h3>
+                            <p class="text-xs text-slate-500">周知・教育における課題</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">発生した問題</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-slate-700 text-sm">
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400 mt-1 shrink-0"></i>
+                                        <span>マニュアルを各団体へ配布したが、現場では実行されなかった。</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-slate-700 text-sm">
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400 mt-1 shrink-0"></i>
+                                        <span><strong>お化け屋敷</strong>の団体から、重し代わりの液体入りペットボトルがそのまま廃棄され、液漏れ事故が発生。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                                <h4 class="text-sm font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+                                    改善アクション
+                                </h4>
+                                <ul class="space-y-2">
+                                    <li class="text-sm text-slate-700 flex items-start gap-2">
+                                        <span class="font-bold text-emerald-600">・</span>
+                                        <span>配布のみでなく、<strong>直接講習会</strong>を開催する（内務局主導での実施を検討）。</span>
+                                    </li>
+                                    <li class="text-sm text-slate-700 flex items-start gap-2">
+                                        <span class="font-bold text-emerald-600">・</span>
+                                        <span>特殊ゴミ（液体など）が出る可能性がある団体への個別事前ヒアリング。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Study 2: Operations -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="bg-blue-50 p-4 border-b border-blue-100 flex items-center gap-3">
+                        <div class="bg-blue-100 p-2 rounded-lg text-blue-700">
+                            <i data-lucide="activity" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">CASE 2: 業務過多とワンオペ化</h3>
+                            <p class="text-xs text-slate-500">体制・シフトにおける課題</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">発生した問題</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-slate-700 text-sm">
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400 mt-1 shrink-0"></i>
+                                        <span>「監督」想定のメンバーが実働部隊となり、負担が集中した。</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-slate-700 text-sm">
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400 mt-1 shrink-0"></i>
+                                        <span>長時間稼働による疲労の蓄積、およびワンオペ状態の発生。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                                <h4 class="text-sm font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+                                    改善アクション
+                                </h4>
+                                <ul class="space-y-2">
+                                    <li class="text-sm text-slate-700 flex items-start gap-2">
+                                        <span class="font-bold text-emerald-600">・</span>
+                                        <span>連続稼働時間の上限設定（3時間）。</span>
+                                    </li>
+                                    <li class="text-sm text-slate-700 flex items-start gap-2">
+                                        <span class="font-bold text-emerald-600">・</span>
+                                        <span>状況に合わせてスタッフを柔軟に移動させる仕組みの構築。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Case Study 3: Equipment -->
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+                    <div class="bg-orange-50 p-4 border-b border-orange-100 flex items-center gap-3">
+                        <div class="bg-orange-100 p-2 rounded-lg text-orange-700">
+                            <i data-lucide="box" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-800">CASE 3: 備品管理と連携ミス</h3>
+                            <p class="text-xs text-slate-500">備品・ロジスティクスにおける課題</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-2">発生した問題</h4>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start gap-2 text-slate-700 text-sm">
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400 mt-1 shrink-0"></i>
+                                        <span>ゴミ箱に<strong>養生テープを直接貼付</strong>し、破損や汚れのリスクがあった。</span>
+                                    </li>
+                                    <li class="flex items-start gap-2 text-slate-700 text-sm">
+                                        <i data-lucide="x-circle" class="w-4 h-4 text-red-400 mt-1 shrink-0"></i>
+                                        <span>5階ゴミステーション設営時、管轄外のテーブルが無断で移動され、片付け作業に支障が出た。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                                <h4 class="text-sm font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <i data-lucide="arrow-right-circle" class="w-4 h-4"></i>
+                                    改善アクション
+                                </h4>
+                                <ul class="space-y-2">
+                                    <li class="text-sm text-slate-700 flex items-start gap-2">
+                                        <span class="font-bold text-emerald-600">・</span>
+                                        <span>備品貸借時の「管理元合意」プロセスの徹底。</span>
+                                    </li>
+                                    <li class="text-sm text-slate-700 flex items-start gap-2">
+                                        <span class="font-bold text-emerald-600">・</span>
+                                        <span>養生テープ使用ルールの明確化（直貼り禁止など）。</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Tab Content: GUIDELINES (New) -->
+        <div id="guidelines" class="tab-content animate-fadeIn">
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="bg-indigo-100 p-3 rounded-xl text-indigo-600">
+                        <i data-lucide="clipboard-check" class="w-6 h-6"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-800">次年度運用ガイドライン（案）</h2>
+                </div>
+                <p class="text-slate-600 mb-8">
+                    今年度の反省に基づき、次年度のGTO活動において順守すべき具体的な数値基準とルールを策定しました。
+                </p>
+
+                <div class="grid gap-6 md:grid-cols-2">
+                    
+                    <!-- Shift Policy -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>
+                            シフト・勤務規定
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <div class="bg-white p-2 rounded-lg shadow-sm font-bold text-indigo-600 text-lg w-12 text-center shrink-0">3h</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">連続稼働の上限</span>
+                                    <span class="text-xs text-slate-500">集中力と体力の維持のため、3時間を超える連続勤務を禁止とする。</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="bg-white p-2 rounded-lg shadow-sm font-bold text-indigo-600 text-lg w-12 text-center shrink-0">Flex</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">流動的配置システム</span>
+                                    <span class="text-xs text-slate-500">固定配置だけでなく、混雑状況に合わせてスタッフを柔軟に移動させる仕組みを導入する。</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Equipment Policy -->
+                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                            <span class="w-2 h-6 bg-emerald-500 rounded-full"></span>
+                            装備・資材基準
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3">
+                                <div class="bg-white p-2 rounded-lg shadow-sm font-bold text-emerald-600 text-lg w-12 text-center shrink-0">x2</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">軍手（1ステーションあたり）</span>
+                                    <span class="text-xs text-slate-500">汚れや濡れに備え、最低2双を常備する。</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="bg-white p-2 rounded-lg shadow-sm font-bold text-emerald-600 text-lg w-12 text-center shrink-0">Tool</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">トングの導入</span>
+                                    <span class="text-xs text-slate-500">衛生管理のため、手を汚さず作業できるトングを導入する。</span>
+                                </div>
+                            </li>
+                            <li class="flex items-start gap-3">
+                                <div class="bg-white p-2 rounded-lg shadow-sm font-bold text-emerald-600 text-lg w-12 text-center shrink-0">Double</div>
+                                <div>
+                                    <span class="font-bold text-slate-700 block">ゴミ袋の二重化</span>
+                                    <span class="text-xs text-slate-500">液漏れや破れ防止のため、ゴミ袋は原則二重にして使用する。</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Content: FUTURE -->
+        <div id="future" class="tab-content animate-fadeIn">
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-3xl p-8 md:p-12 shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+                
+                <div class="relative z-10">
+                    <div class="flex items-center gap-3 mb-6 text-emerald-400 font-bold tracking-wider uppercase text-sm">
+                        <i data-lucide="megaphone" class="w-4 h-4"></i> Next Year Strategy
+                    </div>
+                    
+                    <h2 class="text-3xl md:text-4xl font-bold mb-8 leading-tight">
+                        「有志」から「組織」へ。<br />
+                        持続可能な運営体制への転換。
+                    </h2>
+
+                    <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 mb-8">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                            提言：内務局等への統合
+                        </h3>
+                        <p class="text-slate-300 leading-relaxed mb-4">
+                            現在の「希望者・兼任」による運営には、責任範囲と人的リソースのバランスに限界が見えています。
+                            来年度は独立組織ではなく、<strong>「内務」などの既存部署へ吸収合併し、組織的な権限とリソースを持った運用</strong>へ移行することが望ましいと考えられます。
+                        </p>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <div class="text-emerald-400 font-bold mb-1">Benefit 1</div>
+                            <div class="text-sm text-slate-300">権限の明確化による、各団体への指導力向上（講習会の義務化など）</div>
+                        </div>
+                        <div class="flex-1 bg-white/5 p-4 rounded-xl border border-white/5">
+                            <div class="text-emerald-400 font-bold mb-1">Benefit 2</div>
+                            <div class="text-sm text-slate-300">安定した人員配置と、特定メンバーへの負担の分散</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 text-center">
+                <p class="text-slate-500 text-sm">
+                    Generated from GTO 2024 Feedback Survey
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            // Hide all contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Deactivate all buttons
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-white', 'text-emerald-700', 'shadow-md', 'ring-2', 'ring-emerald-500/20');
+                btn.classList.add('bg-white/60', 'text-slate-500');
+            });
+
+            // Show selected content
+            document.getElementById(tabName).classList.add('active');
+
+            // Activate selected button
+            const activeBtn = document.getElementById('btn-' + tabName);
+            activeBtn.classList.remove('bg-white/60', 'text-slate-500');
+            activeBtn.classList.add('active', 'bg-white', 'text-emerald-700', 'shadow-md', 'ring-2', 'ring-emerald-500/20');
+        }
+    </script>
+</body>
+</html>
