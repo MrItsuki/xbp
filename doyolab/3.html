@@ -5,10 +5,49 @@
         <title>道用ゼミ</title>
         <meta name="description" content="神奈川大学、XBP授業">
         <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
-        <link href="https://fonts.googleap.com/css?family=Philosopher" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Philosopher" rel="stylesheet">
         <link href="./css/style.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="./images/yunboulab_icon.png">
     
+        <style>
+            /* PDF表示エリアのデザイン */
+            #pdf-wrapper {
+                width: 100%;
+                text-align: center;
+                background-color: #f4f4f4;
+                padding: 20px 0;
+                margin-top: 20px;
+            }
+            #pdf-render {
+                max-width: 100%; /* スマホではみ出さないように */
+                height: auto;
+                border: 1px solid #ddd;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            .pdf-controls {
+                margin-bottom: 15px;
+            }
+            .pdf-controls button {
+                padding: 5px 15px;
+                cursor: pointer;
+                background: #333;
+                color: #fff;
+                border: none;
+                border-radius: 4px;
+            }
+            .pdf-controls button:hover {
+                background: #555;
+            }
+            .pdf-controls span {
+                margin: 0 10px;
+                font-weight: bold;
+            }
+        </style>
+        
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+        <script>
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        </script>
     </head>
 
     <body>
@@ -37,8 +76,6 @@
                     <h2 class="post-title">衣類循環を小さい子へ、そして親へ。</h2>
                     <p class="post-date">1/8 <span>2026</span></p>
                     <p class="post-cat">カテゴリー：課題</p>
-                    
-                   
                 </header>
 
                 <h3 class="sub-title">班メンバー</h3>
@@ -62,23 +99,38 @@
                     <img src="./images/community-loops.webp" alt="コミュニティーループス">
                 </div>
 
-                <h3 class="sub-title">提案サービス：「使わなくなった子供の服でワークショップ」</h3>
+                <h3 class="sub-title">現在のCommunity loopsの課題</h3>
                 <div class="post-content">
                     <p>
-                    私は小さい子供がいる親御さんをターゲットに、子供服の循環を促進するサービスを提案しました。<br>
+                    現在のCommunity loopsは、要らなくなった服をリサイクルしますよーと言って集め、消費者からの信頼を得て、
+                    実際には途上国に着れない服を流しているだけのなんちゃって衣類循環がある現状を、
+                    NFCタグを用いて自分が渡したがどこに循環されているのか透明化し、解決。<br>
+                    その特徴を活かし、服の循環を促進するサービスを提案している。<br>
+                    しかし、服を循環するには、要らなくなった服を燃えるゴミとしてパパっと捨ててしまう消費者の行動を変える必要がある。<br>
+                    Community loopsの現状の課題は、この行動を変える施策が不足していることであると考えた。<br>
+
+                    ここで、私たちは子供服に着目した。<br>
                     子供服は成長が早く、1~2年ほどでサイズアウトしてしまうのに対し、
-                    花王のアンケート調査では、大人は4~5年で服を捨てるという結果で出ています。<br>
+                    花王のアンケート調査では、大人は平均4.9年で服を捨てるという結果で出ている。<br>
                     </p>
                     <img src="./images/子供服循環_5p.png" alt="子供服の循環促進">
-                </div>                                                                                    
-                
-                
-              
-              
+                </div>                                    
 
-           
-                
-             
+                <h3 class="sub-title">提案サービス：「使わなくなった子供の服でワークショップ」</h3>
+                <div class="post-content">
+                    
+                    <div id="pdf-wrapper">
+                        <div class="pdf-controls">
+                            <button id="prev" type="button">前のページ</button>
+                            <span>ページ: <span id="page_num">--</span> / <span id="page_count">--</span></span>
+                            <button id="next" type="button">次のページ</button>
+                        </div>
+                        <canvas id="pdf-render"></canvas>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">
+                            ※うまく表示されない場合は<a href="./files/presentation.pdf" id="pdf-download-link">こちらからダウンロード</a>してください。
+                        </p>
+                    </div>
+                    </div>                                                                                                                                              
             </article>
             <aside>
                 <h3 class="sub-title">課題一覧</h3>
@@ -86,22 +138,82 @@
                     <li><a href="1.html">鎌倉プロジェクト</a></li>
                     <li><a href="2.html">横浜ミライ創造会議</a></li>
                     <li><a href="3.html">衣類サーキュラーエコノミー</a></li>
-                   
-                  
-                 
                 </ul>
-
-               
-                
             </aside>
+        </div>
 
+        <script>
+            // ★★★ 重要：ここにPDFのファイルパスを指定してください ★★★
+            const pdfUrl = './images/子供服循環_最終_SEAds.pdf'; 
+            // 例: './images/slide.pdf' など
             
-             
+            // ダウンロードリンクも書き換える（念のため）
+            document.getElementById('pdf-download-link').href = pdfUrl;
 
+            let pdfDoc = null,
+                pageNum = 1,
+                pageRendering = false,
+                pageNumPending = null,
+                scale = 1.5, // 拡大率（調整可能）
+                canvas = document.getElementById('pdf-render'),
+                ctx = canvas.getContext('2d');
 
-        
-       
-    </body>
-    
- 
+            function renderPage(num) {
+                pageRendering = true;
+                pdfDoc.getPage(num).then(function(page) {
+                    var viewport = page.getViewport({scale: scale});
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    var renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    var renderTask = page.render(renderContext);
+
+                    renderTask.promise.then(function() {
+                        pageRendering = false;
+                        if (pageNumPending !== null) {
+                            renderPage(pageNumPending);
+                            pageNumPending = null;
+                        }
+                    });
+                });
+                document.getElementById('page_num').textContent = num;
+            }
+
+            function queueRenderPage(num) {
+                if (pageRendering) {
+                    pageNumPending = num;
+                } else {
+                    renderPage(num);
+                }
+            }
+
+            function onPrevPage() {
+                if (pageNum <= 1) { return; }
+                pageNum--;
+                queueRenderPage(pageNum);
+            }
+            document.getElementById('prev').addEventListener('click', onPrevPage);
+
+            function onNextPage() {
+                if (pageNum >= pdfDoc.numPages) { return; }
+                pageNum++;
+                queueRenderPage(pageNum);
+            }
+            document.getElementById('next').addEventListener('click', onNextPage);
+
+            pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc_) {
+                pdfDoc = pdfDoc_;
+                document.getElementById('page_count').textContent = pdfDoc.numPages;
+                renderPage(pageNum);
+            }).catch(function(error) {
+                console.error('PDF読み込みエラー:', error);
+                // エラー時はキャンバスにメッセージを出すなどの処理
+                ctx.font = '20px Arial';
+                ctx.fillText('PDFが見つかりません', 10, 50);
+            });
+        </script>
+        </body>
 </html>
