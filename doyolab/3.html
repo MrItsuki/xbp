@@ -2,15 +2,112 @@
 <html lang="ja">
     <head>
         <meta charset="UTF-8">
-        <title>道用ゼミ</title>
+        <title>ユン坊の道用ゼミ</title>
         <meta name="description" content="神奈川大学、XBP授業">
-        <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"> <link rel="stylesheet" href="https://unpkg.com/ress/dist/ress.min.css">
         <link href="https://fonts.googleapis.com/css?family=Philosopher" rel="stylesheet">
         <link href="./css/style.css" rel="stylesheet">
         <link rel="icon" type="image/png" href="./images/yunboulab_icon.png">
     
         <style>
-            /* PDF表示エリアのデザイン */
+            /* --- 追加機能：目次とレイアウト用のCSS --- */
+            
+            /* スクロールを滑らかにする */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* 記事とサイドバーを横並びにするレイアウト */
+            .news-contents.wrapper {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start; /* stickyを効かせるために重要 */
+                gap: 40px; /* 記事とサイドバーの間隔 */
+                padding-top: 40px;
+                padding-bottom: 40px;
+            }
+
+            /* 記事部分の幅調整 */
+            article {
+                width: 70%; /* 必要に応じて調整してください */
+            }
+
+            /* サイドバー（目次）のデザインと動き */
+            aside {
+                width: 25%; /* 必要に応じて調整してください */
+                position: -webkit-sticky; /* Safari用 */
+                position: sticky;
+                top: 20px; /* 画面上部からどれくらいで止まるか */
+            }
+
+            /* 目次のボックスデザイン */
+            .toc-box {
+                background-color: #fff;
+                border: 1px solid #eee;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+
+            .toc-box p {
+                font-weight: bold;
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+                text-align: center;
+                border-bottom: 2px solid #ddd;
+                padding-bottom: 10px;
+            }
+
+            .toc-box ul {
+                list-style: none;
+                padding: 0;
+            }
+
+            .toc-box li {
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+            }
+
+            .toc-box li a {
+                text-decoration: none;
+                color: #333;
+                display: block;
+                transition: color 0.3s;
+            }
+
+            .toc-box li a:hover {
+                color: #007bff;
+                text-decoration: underline;
+            }
+
+            /* 階層表現（h4用） */
+            .toc-sub {
+                margin-left: 15px;
+                font-size: 0.85rem;
+                list-style: circle;
+            }
+
+            /* ジャンプした時に見出しが隠れないようにする調整 */
+            h3[id], h4[id] {
+                scroll-margin-top: 20px; 
+            }
+
+            /* スマホ用のレスポンシブ対応 */
+            @media (max-width: 768px) {
+                .news-contents.wrapper {
+                    flex-direction: column;
+                }
+                article, aside {
+                    width: 100%;
+                }
+                aside {
+                    position: static; /* スマホでは追従させない */
+                    margin-top: 40px;
+                }
+            }
+
+
+            /* --- 元々のPDF表示エリアのデザイン --- */
             #pdf-wrapper {
                 width: 100%;
                 text-align: center;
@@ -41,6 +138,20 @@
             .pdf-controls span {
                 margin: 0 10px;
                 font-weight: bold;
+            }
+            /* クラス指定でのキャンバス用スタイル（複数設置対応） */
+            .pdf-wrapper-style {
+                width: 100%;
+                text-align: center;
+                background-color: #f4f4f4;
+                padding: 20px 0;
+                margin-top: 20px;
+            }
+            .pdf-canvas-style {
+                max-width: 100%;
+                height: auto;
+                border: 1px solid #ddd;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
             }
         </style>
         
@@ -83,7 +194,7 @@
                 <a class="button" href="https://suzytsuna.github.io/xbp/doyolab/">ツナ</a>
                 </div>
 
-                <h3 class="sub-title">Community loops</h3>
+                <h3 id="section1" class="sub-title">Community loops</h3>
 
                 <div class="post-content">
                     <p>服がめぐり、人がつながる。地域発の衣類循環プロジェクト「Community Loops」。<br>
@@ -99,7 +210,7 @@
                     <img src="./images/community-loops.webp" alt="コミュニティーループス">
                 </div>
 
-                <h3 class="sub-title">現在のCommunity loopsの課題</h3>
+                <h3 id="section2" class="sub-title">現在のCommunity loopsの課題</h3>
                 <div class="post-content">
                     <p>
                     現在のCommunity loopsは、要らなくなった服をリサイクルしますよーと言って集め、消費者からの信頼を得て、
@@ -110,7 +221,8 @@
                     Community loopsの現状の課題は、この行動を変える施策が不足していることであると考えた。</p>
                     
                 </div>
-                <h3 class="sub-title">解決策：子供服</h3>
+                
+                <h3 id="section3" class="sub-title">着目点：子供服</h3>
                 <div class="post-content">
                     <p>
                     ここで、私たちは子供服に着目した。<br>
@@ -123,25 +235,56 @@
                 
                     </p>
                 </div>
-                <h3 class="sub-title">解決策：子供服アップサイクルワークショップ</h3>        
+
+                <h3 id="section4" class="sub-title">解決策：子供服アップサイクルワークショップ</h3>        
                 <div class="post-content">
                     <p>
                     そこで、子供服の循環を促進するために、子供服アップサイクルワークショップを提案する。<br>
                     子供服アップサイクルワークショップでは、子供服を使ってアクリルスタンドを作成し、要らなくなった子供服に新たな価値を付与する。<br>
                     これにより、子供服の循環を促進するとともに、親子の思い出作りにも貢献する。<br>
                     </p>
+                    <p>
+                    ワークショップの流れは以下の通りである。<br>
+                    初めに衣類循環がどのようになってしまっているのか、今の現状の問題点と、Community loopsの取り組みを説明する。<br>
+                    </p>
+                    <img src="./images/スライド6p_SEAds.png" alt="子供服ワークショップ流れ">
                 </div>
-                <h4 class="sub-title">制作物イメージ(中間 ver.)</h4>
+
+                <h4 id="section4-1" class="sub-title">制作物イメージ(中間 ver.)</h4>
                 <div class="post-content">  
                     <img src="./images/子供服循環_作成物_中間.jpg" alt="子供服ワークショップイメージ">       
                 </div>
-                <h4 class="sub-title">制作物イメージ(最終 ver.)</h4>
+
+                <h4 id="section4-2" class="sub-title">制作物イメージ(最終 ver.)</h4>
                 <div class="post-content">  
                     <img src="./images/作成物表_最終_SEAds.jpg" alt="子供服ワークショップイメージ"> 
                     <img src="./images/作成物裏_最終_SEAds.jpg" alt="子供服ワークショップイメージ">      
                 </div>
 
-                <h3 class="sub-title">中間発表スライド</h3>
+                <h3 id="section5" class="sub-title">ワークショップ開催場所</h3>
+                <div class="post-content"> 
+                    <p>
+                        ワークショップは学生団体SEAdsで繋がった「Warmth Space」で行わせていただく予定である。<br>
+                        一時預かり保育 を行っている子育て支援施設不登校支援や「孤立しない子育て」を推進。<br>
+                        安心して子育てができる環境づくりに尽力。<br>
+                        ターゲットである「子供を持つ親」との親和性が高い理念が一致しており協力体制を築きやすいと考えた。
+
+                    </p>
+                    <img src="./images/スライド11p_SEAds.png" alt="ワークショップ開催場所">
+                </div>
+
+                <h3 id="section6" class="sub-title">今後のアクションプラン</h3>
+                <div class="post-content"> 
+                    <p>
+                        今後のアクションプランとして、このワークショップで作成するものを全国どこでも出来るようにマニュアル化。<br>
+                        また、NFCタグに子どもの子を入れ、作ったスタンドにスマホをかざすと、子どもの声がすぐに聞けるように出来るシステムを導入予定。<br>
+                        ワークショップの会場では、アップサイクルする服以外にも、要らなくなってしまった服を持参していただき、Community loopsに回収してもらう仕組みを導入したい。<br>
+                    </p>
+                    <img src="./images/スライド10p_SEAds.png" alt="今後のアクションプラン">
+                </div>
+
+
+                <h3 id="section7" class="sub-title">中間発表スライド</h3>
                 <div class="post-content">              
                     <div id="pdf-wrapper-style">
                         <div class="pdf-controls">
@@ -156,7 +299,7 @@
                     </div>
                     </div>                          
 
-                <h3 class="sub-title">最終発表スライド</h3>
+                <h3 id="section8" class="sub-title">最終発表スライド</h3>
                 <div class="post-content">
                     <div class="pdf-wrapper-style">
                         <div class="pdf-controls">
@@ -169,30 +312,34 @@
                             ※うまく表示されない場合は<a href="./images/子供服循環_最終_SEAds.pdf" id="pdf-download-link">こちらからダウンロード</a>してください。
                         </p>
                     </div>
-                </div>                                                                                                                           
+                </div>                                                                                                                                                                                          
             </article>
+
             <aside>
-                <h3 class="sub-title">課題一覧</h3>
-                <ul class="sub-menu">
-                    <li><a href="1.html">鎌倉プロジェクト</a></li>
-                    <li><a href="2.html">横浜ミライ創造会議</a></li>
-                    <li><a href="3.html">衣類サーキュラーエコノミー</a></li>
-                </ul>
+                <nav class="toc-box">
+                    <p>目次</p>
+                    <ul>
+                        <li><a href="#section1">Community loops</a></li>
+                        <li><a href="#section2">現在の課題</a></li>
+                        <li><a href="#section3">着目点：子供服</a></li>
+                        <li><a href="#section4">解決策：ワークショップ</a></li>
+                        <li class="toc-sub"><a href="#section4-1">制作物イメージ(中間)</a></li>
+                        <li class="toc-sub"><a href="#section4-2">制作物イメージ(最終)</a></li>
+                        <li><a href="#section5">開催場所</a></li>
+                        <li><a href="#section6">今後のアクションプラン</a></li>
+                        <li><a href="#section7">中間発表スライド</a></li>
+                        <li><a href="#section8">最終発表スライド</a></li>
+                    </ul>
+                </nav>
             </aside>
-                </div>
+            </div>
 
         <script>
-            // PDF.jsのワーカー設定（これは1回だけでOK）
+            // PDF.jsのワーカー設定
             pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
             /**
              * PDFビューワーをセットアップする関数
-             * @param {string} url - PDFファイルのパス
-             * @param {string} canvasId - 表示するキャンバスのID
-             * @param {string} prevBtnId - 「前へ」ボタンのID
-             * @param {string} nextBtnId - 「次へ」ボタンのID
-             * @param {string} pageNumId - 現在ページ番号のspan ID
-             * @param {string} pageCountId - 総ページ数のspan ID
              */
             function setupPdfViewer(url, canvasId, prevBtnId, nextBtnId, pageNumId, pageCountId) {
                 let pdfDoc = null,
@@ -263,28 +410,9 @@
                 });
             }
 
-            // ▼▼▼ ここで表示したいPDFを登録します ▼▼▼
-            
-            // 1つ目のPDF
-            setupPdfViewer(
-                './images/子供服循環_中間_SEAds.pdf', // PDFファイルのパス
-                'pdf-render-1',             // キャンバスID
-                'prev-1',                   // 前へボタンID
-                'next-1',                   // 次へボタンID
-                'page_num-1',               // ページ番号ID
-                'page_count-1'              // 総ページID
-            );
-
-            // 2つ目のPDF
-            setupPdfViewer(
-                './images/子供服循環_最終_SEAds.pdf', // 2つ目のPDFパス
-                'pdf-render-2',             // キャンバスID (末尾を2にする)
-                'prev-2',                   
-                'next-2',                   
-                'page_num-2',               
-                'page_count-2'              
-            );
-            
+            // PDFの登録
+            setupPdfViewer('./images/子供服循環_中間_SEAds.pdf', 'pdf-render-1', 'prev-1', 'next-1', 'page_num-1', 'page_count-1');
+            setupPdfViewer('./images/子供服循環_最終_SEAds.pdf', 'pdf-render-2', 'prev-2', 'next-2', 'page_num-2', 'page_count-2');
         </script>
     </body>
 </html>
