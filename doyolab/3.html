@@ -107,30 +107,69 @@
                     NFCタグを用いて自分が渡したがどこに循環されているのか透明化し、解決。<br>
                     その特徴を活かし、服の循環を促進するサービスを提案している。<br>
                     しかし、服を循環するには、要らなくなった服を燃えるゴミとしてパパっと捨ててしまう消費者の行動を変える必要がある。<br>
-                    Community loopsの現状の課題は、この行動を変える施策が不足していることであると考えた。<br>
-
+                    Community loopsの現状の課題は、この行動を変える施策が不足していることであると考えた。</p>
+                    
+                </div>
+                <h3 class="sub-title">解決策：子供服</h3>
+                <div class="post-content">
+                    <p>
                     ここで、私たちは子供服に着目した。<br>
                     子供服は成長が早く、1~2年ほどでサイズアウトしてしまうのに対し、
                     花王のアンケート調査では、大人は平均4.9年で服を捨てるという結果で出ている。<br>
                     </p>
                     <img src="./images/子供服循環_5p.png" alt="子供服の循環促進">
-                </div>                                    
-
-                <h3 class="sub-title">提案サービス：「使わなくなった子供の服でワークショップ」</h3>
+                    <p>
+                    そこで、ただ大人に対して衣類循環を広めるよりも、子供服の循環を促進することで、その親の意識も変えることが出来、結果として服の循環に対する意識を効果的に促進できるのではないかと考えた。<br>
+                
+                    </p>
+                </div>
+                <h3 class="sub-title">解決策：子供服アップサイクルワークショップ</h3>        
                 <div class="post-content">
-                    
-                    <div id="pdf-wrapper">
+                    <p>
+                    そこで、子供服の循環を促進するために、子供服アップサイクルワークショップを提案する。<br>
+                    子供服アップサイクルワークショップでは、子供服を使ってアクリルスタンドを作成し、要らなくなった子供服に新たな価値を付与する。<br>
+                    これにより、子供服の循環を促進するとともに、親子の思い出作りにも貢献する。<br>
+                    </p>
+                </div>
+                <h4 class="sub-title">制作物イメージ(中間 ver.)</h4>
+                <div class="post-content">  
+                    <img src="./images/子供服循環_作成物_中間.jpg" alt="子供服ワークショップイメージ">       
+                </div>
+                <h4 class="sub-title">制作物イメージ(最終 ver.)</h4>
+                <div class="post-content">  
+                    <img src="./images/作成物表_最終_SEAds.jpg" alt="子供服ワークショップイメージ"> 
+                    <img src="./images/作成物裏_最終_SEAds.jpg" alt="子供服ワークショップイメージ">      
+                </div>
+
+                <h3 class="sub-title">中間発表スライド</h3>
+                <div class="post-content">              
+                    <div id="pdf-wrapper-style">
                         <div class="pdf-controls">
-                            <button id="prev" type="button">前のページ</button>
-                            <span>ページ: <span id="page_num">--</span> / <span id="page_count">--</span></span>
-                            <button id="next" type="button">次のページ</button>
+                            <button id="prev-1" type="button">前のページ</button>
+                            <span>ページ: <span id="page_num-1">--</span> / <span id="page_count-1">--</span></span>
+                            <button id="next-1" type="button">次のページ</button>
                         </div>
-                        <canvas id="pdf-render"></canvas>
+                        <canvas id="pdf-render-1" class="pdf-canvas-style"></canvas>
                         <p style="font-size: 0.8rem; margin-top: 10px;">
-                            ※うまく表示されない場合は<a href="./files/presentation.pdf" id="pdf-download-link">こちらからダウンロード</a>してください。
+                            ※うまく表示されない場合は<a href="./images/子供服循環_中間_SEAds.pdf" id="pdf-download-link">こちらからダウンロード</a>してください。
                         </p>
                     </div>
-                    </div>                                                                                                                                              
+                    </div>                          
+
+                <h3 class="sub-title">最終発表スライド</h3>
+                <div class="post-content">
+                    <div class="pdf-wrapper-style">
+                        <div class="pdf-controls">
+                            <button id="prev-2" type="button">前のページ</button>
+                            <span>ページ: <span id="page_num-2">--</span> / <span id="page_count-2">--</span></span>
+                            <button id="next-2" type="button">次のページ</button>
+                        </div>
+                        <canvas id="pdf-render-2" class="pdf-canvas-style"></canvas>
+                        <p style="font-size: 0.8rem; margin-top: 10px;">
+                            ※うまく表示されない場合は<a href="./images/子供服循環_最終_SEAds.pdf" id="pdf-download-link">こちらからダウンロード</a>してください。
+                        </p>
+                    </div>
+                </div>                                                                                                                           
             </article>
             <aside>
                 <h3 class="sub-title">課題一覧</h3>
@@ -140,80 +179,112 @@
                     <li><a href="3.html">衣類サーキュラーエコノミー</a></li>
                 </ul>
             </aside>
-        </div>
+                </div>
 
         <script>
-            // ★★★ 重要：ここにPDFのファイルパスを指定してください ★★★
-            const pdfUrl = './images/子供服循環_最終_SEAds.pdf'; 
-            // 例: './images/slide.pdf' など
-            
-            // ダウンロードリンクも書き換える（念のため）
-            document.getElementById('pdf-download-link').href = pdfUrl;
+            // PDF.jsのワーカー設定（これは1回だけでOK）
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-            let pdfDoc = null,
-                pageNum = 1,
-                pageRendering = false,
-                pageNumPending = null,
-                scale = 1.5, // 拡大率（調整可能）
-                canvas = document.getElementById('pdf-render'),
-                ctx = canvas.getContext('2d');
+            /**
+             * PDFビューワーをセットアップする関数
+             * @param {string} url - PDFファイルのパス
+             * @param {string} canvasId - 表示するキャンバスのID
+             * @param {string} prevBtnId - 「前へ」ボタンのID
+             * @param {string} nextBtnId - 「次へ」ボタンのID
+             * @param {string} pageNumId - 現在ページ番号のspan ID
+             * @param {string} pageCountId - 総ページ数のspan ID
+             */
+            function setupPdfViewer(url, canvasId, prevBtnId, nextBtnId, pageNumId, pageCountId) {
+                let pdfDoc = null,
+                    pageNum = 1,
+                    pageRendering = false,
+                    pageNumPending = null,
+                    scale = 1.5,
+                    canvas = document.getElementById(canvasId),
+                    ctx = canvas.getContext('2d');
 
-            function renderPage(num) {
-                pageRendering = true;
-                pdfDoc.getPage(num).then(function(page) {
-                    var viewport = page.getViewport({scale: scale});
-                    canvas.height = viewport.height;
-                    canvas.width = viewport.width;
+                function renderPage(num) {
+                    pageRendering = true;
+                    pdfDoc.getPage(num).then(function(page) {
+                        var viewport = page.getViewport({scale: scale});
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
 
-                    var renderContext = {
-                        canvasContext: ctx,
-                        viewport: viewport
-                    };
-                    var renderTask = page.render(renderContext);
+                        var renderContext = {
+                            canvasContext: ctx,
+                            viewport: viewport
+                        };
+                        var renderTask = page.render(renderContext);
 
-                    renderTask.promise.then(function() {
-                        pageRendering = false;
-                        if (pageNumPending !== null) {
-                            renderPage(pageNumPending);
-                            pageNumPending = null;
-                        }
+                        renderTask.promise.then(function() {
+                            pageRendering = false;
+                            if (pageNumPending !== null) {
+                                renderPage(pageNumPending);
+                                pageNumPending = null;
+                            }
+                        });
                     });
-                });
-                document.getElementById('page_num').textContent = num;
-            }
-
-            function queueRenderPage(num) {
-                if (pageRendering) {
-                    pageNumPending = num;
-                } else {
-                    renderPage(num);
+                    document.getElementById(pageNumId).textContent = num;
                 }
+
+                function queueRenderPage(num) {
+                    if (pageRendering) {
+                        pageNumPending = num;
+                    } else {
+                        renderPage(num);
+                    }
+                }
+
+                function onPrevPage() {
+                    if (pageNum <= 1) { return; }
+                    pageNum--;
+                    queueRenderPage(pageNum);
+                }
+
+                function onNextPage() {
+                    if (pageNum >= pdfDoc.numPages) { return; }
+                    pageNum++;
+                    queueRenderPage(pageNum);
+                }
+
+                // イベントリスナーの設定
+                document.getElementById(prevBtnId).addEventListener('click', onPrevPage);
+                document.getElementById(nextBtnId).addEventListener('click', onNextPage);
+
+                // PDFの読み込み開始
+                pdfjsLib.getDocument(url).promise.then(function(pdfDoc_) {
+                    pdfDoc = pdfDoc_;
+                    document.getElementById(pageCountId).textContent = pdfDoc.numPages;
+                    renderPage(pageNum);
+                }).catch(function(error) {
+                    console.error('Error loading PDF: ' + url, error);
+                    ctx.font = '16px sans-serif';
+                    ctx.fillText('PDFを読み込めませんでした', 10, 50);
+                });
             }
 
-            function onPrevPage() {
-                if (pageNum <= 1) { return; }
-                pageNum--;
-                queueRenderPage(pageNum);
-            }
-            document.getElementById('prev').addEventListener('click', onPrevPage);
+            // ▼▼▼ ここで表示したいPDFを登録します ▼▼▼
+            
+            // 1つ目のPDF
+            setupPdfViewer(
+                './images/子供服循環_中間_SEAds.pdf', // PDFファイルのパス
+                'pdf-render-1',             // キャンバスID
+                'prev-1',                   // 前へボタンID
+                'next-1',                   // 次へボタンID
+                'page_num-1',               // ページ番号ID
+                'page_count-1'              // 総ページID
+            );
 
-            function onNextPage() {
-                if (pageNum >= pdfDoc.numPages) { return; }
-                pageNum++;
-                queueRenderPage(pageNum);
-            }
-            document.getElementById('next').addEventListener('click', onNextPage);
-
-            pdfjsLib.getDocument(pdfUrl).promise.then(function(pdfDoc_) {
-                pdfDoc = pdfDoc_;
-                document.getElementById('page_count').textContent = pdfDoc.numPages;
-                renderPage(pageNum);
-            }).catch(function(error) {
-                console.error('PDF読み込みエラー:', error);
-                // エラー時はキャンバスにメッセージを出すなどの処理
-                ctx.font = '20px Arial';
-                ctx.fillText('PDFが見つかりません', 10, 50);
-            });
+            // 2つ目のPDF
+            setupPdfViewer(
+                './images/子供服循環_最終_SEAds.pdf', // 2つ目のPDFパス
+                'pdf-render-2',             // キャンバスID (末尾を2にする)
+                'prev-2',                   
+                'next-2',                   
+                'page_num-2',               
+                'page_count-2'              
+            );
+            
         </script>
-        </body>
+    </body>
 </html>
