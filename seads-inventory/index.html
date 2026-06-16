@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SEAds 在庫管理システム</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #0058A9;
+      --primary-dark: #004080;
+      --sub: #E8F0FA;
+      --white: #FFFFFF;
+      --accent: #FF6B35;
+      --accent-light: #FFF0EB;
+      --text: #1a1a2e;
+      --text-muted: #666;
+      --border: #dce6f5;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(0,88,169,0.10);
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: #f4f7fb;
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── ヘッダー ─── */
+    header {
+      background: var(--primary);
+      color: var(--white);
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    header img.logo {
+      height: 32px;
+      width: 32px;
+      object-fit: contain;
+    }
+    header .logo-placeholder {
+      width: 32px;
+      height: 32px;
+      background: rgba(255,255,255,0.25);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+    header h1 {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .header-back {
+      margin-right: 4px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 20px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      display: none;
+    }
+    .header-back:hover { background: rgba(255,255,255,0.15); }
+
+    /* ─── 接続状態 ─── */
+    #connection-status {
+      margin-left: auto;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      opacity: 0.9;
+    }
+    #connection-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #4CAF50;
+      transition: background 0.3s;
+    }
+    #connection-dot.offline { background: #FF5252; }
+
+    /* ─── メインコンテンツ ─── */
+    main { padding: 16px; max-width: 900px; margin: 0 auto; }
+
+    /* ─── 画面切り替え ─── */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ─── セクションヘッダー ─── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .section-header h2 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* ─── ボタン ─── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      white-space: nowrap;
+      min-height: 44px;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-secondary { background: var(--sub); color: var(--primary); border: 1.5px solid var(--border); }
+    .btn-secondary:hover { background: #d6e6f7; }
+    .btn-danger { background: #fff0f0; color: #d32f2f; border: 1.5px solid #ffd0d0; }
+    .btn-danger:hover { background: #ffd0d0; }
+    .btn-accent { background: var(--accent); color: var(--white); }
+    .btn-accent:hover { background: #e55a25; }
+    .btn-sm { padding: 6px 12px; font-size: 13px; min-height: 36px; }
+    .btn-icon {
+      width: 44px; height: 44px;
+      padding: 0;
+      border-radius: 8px;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .btn-icon.btn-sm { width: 36px; height: 36px; font-size: 15px; }
+
+    /* ─── カード ─── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+    .card-meta { font-size: 13px; color: var(--text-muted); }
+    .card-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+    /* ─── バッジ ─── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .badge-alert { background: var(--accent); color: var(--white); }
+    .badge-ok { background: #E8F5E9; color: #2e7d32; }
+    .badge-info { background: var(--sub); color: var(--primary); }
+
+    /* ─── 在庫不足サマリー ─── */
+    #alert-summary {
+      background: var(--accent-light);
+      border: 1.5px solid #ffd0bc;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+    #alert-summary h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #alert-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    #alert-list li {
+      font-size: 13px;
+      color: #7a3000;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    #alert-list li::before { content: "⚠"; }
+
+    /* ─── ワークショップカード ─── */
+    .workshop-card { cursor: pointer; transition: box-shadow 0.15s; }
+    .workshop-card:hover { box-shadow: 0 4px 20px rgba(0,88,169,0.15); }
+    .workshop-card .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ─── ワークショップ詳細 ─── */
+    .workshop-info {
+      background: var(--sub);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .workshop-info-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      color: var(--primary-dark);
+    }
+    .workshop-info-item i { font-size: 13px; opacity: 0.7; }
+
+    /* ─── 部品テーブル ─── */
+    .parts-table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead th {
+      background: var(--sub);
+      color: var(--primary);
+      font-weight: 700;
+      padding: 10px 8px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); }
+    tbody tr:last-child { border-bottom: none; }
+    tbody td { padding: 10px 8px; vertical-align: middle; }
+    tbody tr.low-stock { background: #fff5f0; }
+    tbody tr.low-stock .stock-value { color: var(--accent); font-weight: 700; }
+
+    /* ─── 在庫クイック入力 ─── */
+    .stock-control {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .stock-input {
+      width: 64px;
+      height: 44px;
+      text-align: center;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .stock-input:focus { border-color: var(--primary); }
+    .stock-input.low { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── 状態バッジ ─── */
+    .status-badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .status-ok { background: #E8F5E9; color: #2e7d32; }
+    .status-low { background: var(--accent-light); color: var(--accent); }
+
+    /* ─── モーダル ─── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.20);
+    }
+    .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 20px; color: var(--primary); }
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .form-group input:focus,
+    .form-group textarea:focus { border-color: var(--primary); }
+    .form-row { display: flex; gap: 10px; }
+    .form-row .form-group { flex: 1; }
+    .modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
+
+    /* ─── 空状態 ─── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state i { font-size: 40px; color: var(--border); margin-bottom: 12px; display: block; }
+    .empty-state p { font-size: 14px; }
+
+    /* ─── トースト ─── */
+    #toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #333;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 999;
+      transition: transform 0.3s;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── ローディング ─── */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px;
+      color: var(--text-muted);
+      gap: 10px;
+    }
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2.5px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── レスポンシブ ─── */
+    @media (max-width: 600px) {
+      main { padding: 12px; }
+      .form-row { flex-direction: column; }
+      thead th:nth-child(4),
+      tbody td:nth-child(4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<header>
+  <button class="header-back" id="btn-back" aria-label="戻る">
+    <i class="fa-solid fa-arrow-left"></i>
+  </button>
+  <div class="logo-placeholder">
+    <img src="assets/logo.png" alt="SEAds" style="height:28px;width:28px;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <i class="fa-solid fa-cube" style="display:none;color:#fff;font-size:16px;"></i>
+  </div>
+  <h1 id="header-title">SEAds 在庫管理</h1>
+  <div id="connection-status">
+    <div id="connection-dot"></div>
+    <span id="connection-label">接続中</span>
+  </div>
+</header>
+
+<!-- メインコンテンツ -->
+<main>
+
+  <!-- ─── 画面A: ダッシュボード ─── -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="section-header">
+      <h2><i class="fa-solid fa-gauge-high" style="margin-right:6px;"></i>ダッシュボード</h2>
+      <button class="btn btn-primary" id="btn-new-workshop">
+        <i class="fa-solid fa-plus"></i> 新しいワークショップ
+      </button>
+    </div>
+
+    <!-- 在庫不足サマリー -->
+    <div id="alert-summary" style="display:none;">
+      <h3><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足の部品</h3>
+      <ul id="alert-list"></ul>
+    </div>
+
+    <!-- 最終更新 -->
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;" id="last-updated"></p>
+
+    <!-- ワークショップ一覧 -->
+    <div id="workshop-list">
+      <div class="loading"><div class="spinner"></div> 読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ─── 画面B: ワークショップ詳細 ─── -->
+  <div class="screen" id="screen-detail">
+    <div class="section-header">
+      <h2 id="detail-title">ワークショップ詳細</h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" id="btn-duplicate">
+          <i class="fa-solid fa-copy"></i> 複製
+        </button>
+        <button class="btn btn-danger btn-sm" id="btn-delete-workshop">
+          <i class="fa-solid fa-trash"></i> 削除
+        </button>
+      </div>
+    </div>
+
+    <div class="workshop-info" id="detail-info"></div>
+
+    <div class="section-header">
+      <h2 style="font-size:16px;"><i class="fa-solid fa-boxes-stacked" style="margin-right:6px;"></i>部品一覧</h2>
+      <button class="btn btn-primary btn-sm" id="btn-add-part">
+        <i class="fa-solid fa-plus"></i> 部品を追加
+      </button>
+    </div>
+
+    <div class="card parts-table-wrap">
+      <div id="parts-container">
+        <div class="loading"><div class="spinner"></div> 読み込み中...</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ─── モーダル: ワークショップ作成 ─── -->
+<div class="modal-overlay" id="modal-create-workshop">
+  <div class="modal">
+    <h2><i class="fa-solid fa-plus-circle" style="margin-right:8px;"></i>ワークショップ作成</h2>
+    <div class="form-group">
+      <label>ワークショップ名 *</label>
+      <input type="text" id="ws-name" placeholder="例: 夏のものづくり教室" />
+    </div>
+    <div class="form-group">
+      <label>説明</label>
+      <textarea id="ws-desc" rows="2" placeholder="内容の概要を入力"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>開催日 *</label>
+        <input type="date" id="ws-date" />
+      </div>
+      <div class="form-group">
+        <label>開催地 *</label>
+        <input type="text" id="ws-location" placeholder="例: 横浜市立〇〇小学校" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-create-workshop')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-create-ws-submit"><i class="fa-solid fa-check"></i> 作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── モーダル: ワークショップ複製 ─── -->
+<div class="modal-overlay" id="modal-duplicate-workshop">
+  <div class="modal">
+    <h2><i class="fa-solid fa-copy" style="margin-right:8px;"></i>ワークショップを複製</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
+      部品の種類・名前・最低在庫数はそのまま引き継ぎます。在庫数は0にリセットします。
+    </p>
+    <div class="form-group">
+      <label>新しいワークショップ名 *</label>
+      <input type="text" id="dup-name" placeholder="例: 夏のものづくり教室（大和会場）" />
+    </div>
+    <div class="form-group">
+      <label>説明</label>
+      <textarea id="dup-desc" rows="2"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>開催日 *</label>
+        <input type="date" id="dup-date" />
+      </div>
+      <div class="form-group">
+        <label>新しい開催地 *</label>
+        <input type="text" id="dup-location" placeholder="例: 川崎市立〇〇小学校" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-duplicate-workshop')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-dup-submit"><i class="fa-solid fa-copy"></i> 複製して作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── モーダル: 部品追加 ─── -->
+<div class="modal-overlay" id="modal-add-part">
+  <div class="modal">
+    <h2><i class="fa-solid fa-box-open" style="margin-right:8px;"></i>部品を追加</h2>
+    <div class="form-group">
+      <label>部品名 *</label>
+      <input type="text" id="part-name" placeholder="例: PLA フィラメント（白）" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>単位 *</label>
+        <input type="text" id="part-unit" placeholder="例: 個・m・g" />
+      </div>
+      <div class="form-group">
+        <label>初期在庫数 *</label>
+        <input type="number" id="part-stock" min="0" value="0" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>最低在庫数（これを下回ると警告）</label>
+      <input type="number" id="part-min-stock" min="0" value="1" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-part')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-add-part-submit"><i class="fa-solid fa-check"></i> 追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- トースト -->
+<div id="toast"></div>
+
+<!-- Firebase SDK v10 (CDN) -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import {
+    getDatabase, ref, onValue, set, push, remove, update, serverTimestamp, onDisconnect
+  } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+  // ── 設定読み込み ──
+  // firebase-config.js から設定をインポート
+  // ※ ES module環境ではscriptタグのsrc属性から読む
+  let firebaseConfig;
+  try {
+    const m = await import('./firebase-config.js');
+    firebaseConfig = m.firebaseConfig ?? m.default;
+  } catch (e) {
+    console.error('firebase-config.js の読み込みに失敗しました:', e);
+    showToast('⚠ firebase-config.js が見つかりません。README を確認してください。');
+    firebaseConfig = null;
+  }
+
+  let db;
+  if (firebaseConfig && firebaseConfig.apiKey !== 'YOUR_API_KEY') {
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getDatabase(app);
+      initConnectionMonitor(db);
+      initApp(db);
+    } catch (e) {
+      showToast('Firebase 初期化エラー: ' + e.message);
+      console.error(e);
+      renderDemoMode();
+    }
+  } else {
+    // 未設定時はデモモード
+    renderDemoMode();
+    document.getElementById('connection-dot').classList.add('offline');
+    document.getElementById('connection-label').textContent = '未接続（デモ）';
+  }
+
+  // ── 接続状態監視 ──
+  function initConnectionMonitor(db) {
+    const connRef = ref(db, '.info/connected');
+    onValue(connRef, snap => {
+      const dot = document.getElementById('connection-dot');
+      const label = document.getElementById('connection-label');
+      if (snap.val()) {
+        dot.classList.remove('offline');
+        label.textContent = 'オンライン';
+      } else {
+        dot.classList.add('offline');
+        label.textContent = 'オフライン';
+      }
+    });
+  }
+
+  // ── アプリ初期化 ──
+  let currentWorkshopId = null;
+  let allWorkshops = {};
+
+  function initApp(db) {
+    // ワークショップ一覧のリアルタイム監視
+    const wsRef = ref(db, 'workshops');
+    onValue(wsRef, snap => {
+      allWorkshops = snap.val() || {};
+      if (document.getElementById('screen-dashboard').classList.contains('active')) {
+        renderDashboard();
+      } else if (currentWorkshopId) {
+        renderDetail(currentWorkshopId);
+      }
+      updateLastUpdated();
+    });
+
+    // ── ボタンイベント ──
+    document.getElementById('btn-new-workshop').onclick = () => openModal('modal-create-workshop');
+    document.getElementById('btn-back').onclick = showDashboard;
+
+    // ワークショップ作成
+    document.getElementById('btn-create-ws-submit').onclick = async () => {
+      const name = v('ws-name');
+      const location = v('ws-location');
+      const date = v('ws-date');
+      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
+      const wsRef2 = ref(db, 'workshops');
+      await push(wsRef2, {
+        name, description: v('ws-desc'), date, location,
+        createdAt: Date.now(), parts: null
+      });
+      closeModal('modal-create-workshop');
+      clearForm(['ws-name','ws-desc','ws-date','ws-location']);
+      showToast('ワークショップを作成しました');
+    };
+
+    // 複製
+    document.getElementById('btn-dup-submit').onclick = async () => {
+      const name = v('dup-name');
+      const location = v('dup-location');
+      const date = v('dup-date');
+      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
+      const src = allWorkshops[currentWorkshopId];
+      const newParts = {};
+      if (src.parts) {
+        for (const [pid, p] of Object.entries(src.parts)) {
+          newParts[pid] = { name: p.name, unit: p.unit, stock: 0, minStock: p.minStock, updatedAt: Date.now() };
+        }
+      }
+      await push(ref(db, 'workshops'), {
+        name, description: v('dup-desc'), date, location,
+        createdAt: Date.now(),
+        parts: Object.keys(newParts).length ? newParts : null
+      });
+      closeModal('modal-duplicate-workshop');
+      showToast('ワークショップを複製しました');
+    };
+
+    // ワークショップ削除
+    document.getElementById('btn-delete-workshop').onclick = async () => {
+      if (!confirm('このワークショップを削除しますか？部品データもすべて削除されます。')) return;
+      await remove(ref(db, `workshops/${currentWorkshopId}`));
+      showToast('ワークショップを削除しました');
+      showDashboard();
+    };
+
+    // 部品追加
+    document.getElementById('btn-add-part').onclick = () => openModal('modal-add-part');
+    document.getElementById('btn-add-part-submit').onclick = async () => {
+      const name = v('part-name');
+      const unit = v('part-unit');
+      if (!name || !unit) { showToast('部品名と単位は必須です'); return; }
+      const stock = parseInt(v('part-stock')) || 0;
+      const minStock = parseInt(v('part-min-stock')) || 1;
+      await push(ref(db, `workshops/${currentWorkshopId}/parts`), {
+        name, unit, stock, minStock, updatedAt: Date.now()
+      });
+      closeModal('modal-add-part');
+      clearForm(['part-name','part-unit','part-stock','part-min-stock']);
+      showToast('部品を追加しました');
+    };
+
+    // 複製ボタン
+    document.getElementById('btn-duplicate').onclick = () => {
+      const src = allWorkshops[currentWorkshopId];
+      if (!src) return;
+      document.getElementById('dup-name').value = src.name + '（コピー）';
+      document.getElementById('dup-desc').value = src.description || '';
+      document.getElementById('dup-date').value = src.date || '';
+      document.getElementById('dup-location').value = '';
+      openModal('modal-duplicate-workshop');
+    };
+
+    renderDashboard();
+  }
+
+  // ── ダッシュボード描画 ──
+  function renderDashboard() {
+    const list = document.getElementById('workshop-list');
+    const alertSummary = document.getElementById('alert-summary');
+    const alertList = document.getElementById('alert-list');
+
+    if (Object.keys(allWorkshops).length === 0) {
+      list.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-box-open"></i>
+        <p>ワークショップがまだありません。<br>「新しいワークショップ」から作成してください。</p>
+      </div>`;
+      alertSummary.style.display = 'none';
+      return;
+    }
+
+    // 在庫不足アイテム収集
+    const alerts = [];
+    let html = '';
+
+    for (const [wid, ws] of Object.entries(allWorkshops)) {
+      let lowCount = 0;
+      if (ws.parts) {
+        for (const p of Object.values(ws.parts)) {
+          if (p.stock < p.minStock) {
+            lowCount++;
+            alerts.push(`${ws.name}：${p.name}（現在 ${p.stock}${p.unit}、最低 ${p.minStock}${p.unit}）`);
+          }
+        }
+      }
+      const partCount = ws.parts ? Object.keys(ws.parts).length : 0;
+      html += `<div class="card workshop-card" onclick="showDetail('${wid}')">
+        <div class="card-header">
+          <div>
+            <div class="card-title">${esc(ws.name)}</div>
+            <div class="card-meta"><i class="fa-solid fa-location-dot"></i> ${esc(ws.location || '未設定')}　<i class="fa-solid fa-calendar"></i> ${ws.date || '未設定'}</div>
+          </div>
+          ${lowCount > 0 ? `<span class="badge badge-alert"><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足 ${lowCount}件</span>` : `<span class="badge badge-ok"><i class="fa-solid fa-check"></i> 在庫OK</span>`}
+        </div>
+        ${ws.description ? `<p style="font-size:13px;color:var(--text-muted);margin-top:8px;">${esc(ws.description)}</p>` : ''}
+        <div class="card-footer">
+          <span class="badge badge-info"><i class="fa-solid fa-boxes-stacked"></i> 部品 ${partCount}種</span>
+          <span style="font-size:12px;color:var(--text-muted);">タップして詳細を見る <i class="fa-solid fa-chevron-right"></i></span>
+        </div>
+      </div>`;
+    }
+
+    list.innerHTML = html;
+
+    // アラート表示
+    if (alerts.length > 0) {
+      alertSummary.style.display = 'block';
+      alertList.innerHTML = alerts.map(a => `<li>${esc(a)}</li>`).join('');
+    } else {
+      alertSummary.style.display = 'none';
+    }
+  }
+
+  // ── 詳細画面描画 ──
+  function renderDetail(wid) {
+    const ws = allWorkshops[wid];
+    if (!ws) return;
+
+    document.getElementById('detail-title').textContent = ws.name;
+    document.getElementById('detail-info').innerHTML = `
+      <div class="workshop-info-item"><i class="fa-solid fa-location-dot"></i>${esc(ws.location || '未設定')}</div>
+      <div class="workshop-info-item"><i class="fa-solid fa-calendar"></i>${ws.date || '未設定'}</div>
+      ${ws.description ? `<div class="workshop-info-item"><i class="fa-solid fa-note-sticky"></i>${esc(ws.description)}</div>` : ''}
+    `;
+
+    const container = document.getElementById('parts-container');
+    if (!ws.parts || Object.keys(ws.parts).length === 0) {
+      container.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <p>まだ部品がありません。「部品を追加」から登録してください。</p>
+      </div>`;
+      return;
+    }
+
+    let rows = '';
+    for (const [pid, p] of Object.entries(ws.parts)) {
+      const isLow = p.stock < p.minStock;
+      rows += `<tr class="${isLow ? 'low-stock' : ''}" id="row-${pid}">
+        <td><strong>${esc(p.name)}</strong></td>
+        <td>
+          <div class="stock-control">
+            <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${wid}','${pid}',-1)" title="-1">
+              <i class="fa-solid fa-minus"></i>
+            </button>
+            <input class="stock-input ${isLow ? 'low' : ''}" type="number" min="0"
+              value="${p.stock}"
+              onchange="setStock('${wid}','${pid}',this.value)"
+              id="stock-input-${pid}" />
+            <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${wid}','${pid}',1)" title="+1">
+              <i class="fa-solid fa-plus"></i>
+            </button>
+          </div>
+        </td>
+        <td>${esc(p.unit)}</td>
+        <td>${p.minStock}</td>
+        <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? '⚠ 不足' : '✓ OK'}</span></td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      </tr>`;
+    }
+
+    container.innerHTML = `<table>
+      <thead>
+        <tr>
+          <th>部品名</th>
+          <th>在庫数</th>
+          <th>単位</th>
+          <th>最低在庫</th>
+          <th>状態</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  // ── 在庫操作 ──
+  window.adjustStock = async (wid, pid, delta) => {
+    const current = allWorkshops[wid]?.parts?.[pid]?.stock ?? 0;
+    const next = Math.max(0, current + delta);
+    await update(ref(db, `workshops/${wid}/parts/${pid}`), { stock: next, updatedAt: Date.now() });
+  };
+
+  window.setStock = async (wid, pid, val) => {
+    const next = Math.max(0, parseInt(val) || 0);
+    await update(ref(db, `workshops/${wid}/parts/${pid}`), { stock: next, updatedAt: Date.now() });
+  };
+
+  window.deletePart = async (wid, pid) => {
+    if (!confirm('この部品を削除しますか？')) return;
+    await remove(ref(db, `workshops/${wid}/parts/${pid}`));
+    showToast('部品を削除しました');
+  };
+
+  // ── 画面遷移 ──
+  window.showDetail = (wid) => {
+    currentWorkshopId = wid;
+    document.getElementById('screen-dashboard').classList.remove('active');
+    document.getElementById('screen-detail').classList.add('active');
+    document.getElementById('btn-back').style.display = 'flex';
+    renderDetail(wid);
+  };
+
+  function showDashboard() {
+    currentWorkshopId = null;
+    document.getElementById('screen-detail').classList.remove('active');
+    document.getElementById('screen-dashboard').classList.add('active');
+    document.getElementById('btn-back').style.display = 'none';
+    document.getElementById('header-title').textContent = 'SEAds 在庫管理';
+    renderDashboard();
+  }
+
+  // ── デモモード ──
+  function renderDemoMode() {
+    document.getElementById('workshop-list').innerHTML = `<div class="card" style="border:2px dashed var(--accent);">
+      <p style="font-size:14px;color:var(--accent);font-weight:700;margin-bottom:8px;">
+        <i class="fa-solid fa-info-circle"></i> デモモード（Firebase未接続）
+      </p>
+      <p style="font-size:13px;color:var(--text-muted);">
+        <code>firebase-config.js</code> にFirebaseの設定値を入力すると、リアルタイム同期が有効になります。<br>
+        詳しくは <strong>README.md</strong> を参照してください。
+      </p>
+    </div>`;
+    document.getElementById('connection-dot').classList.add('offline');
+    document.getElementById('connection-label').textContent = '未接続';
+  }
+
+  // ── ユーティリティ ──
+  function v(id) { return document.getElementById(id).value.trim(); }
+  function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function clearForm(ids) { ids.forEach(id => { document.getElementById(id).value = id.includes('stock') ? '0' : ''; }); }
+  function updateLastUpdated() {
+    const el = document.getElementById('last-updated');
+    el.textContent = `最終確認: ${new Date().toLocaleString('ja-JP')}`;
+  }
+
+  window.openModal = (id) => document.getElementById(id).classList.add('open');
+  window.closeModal = (id) => document.getElementById(id).classList.remove('open');
+
+  // モーダルの外クリックで閉じる
+  document.querySelectorAll('.modal-overlay').forEach(el => {
+    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+  });
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+  window.showToast = showToast;
+</script>
+
+</body>
+</html>
