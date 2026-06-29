@@ -648,14 +648,19 @@
       const location = v('ws-location');
       const date = v('ws-date');
       if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
-      const wsRef2 = ref(db, 'workshops');
-      await push(wsRef2, {
-        name, description: v('ws-desc'), date, location,
-        createdAt: Date.now(), parts: null
-      });
-      closeModal('modal-create-workshop');
-      clearForm(['ws-name','ws-desc','ws-date','ws-location']);
-      showToast('ワークショップを作成しました');
+      try {
+        const wsRef2 = ref(db, 'workshops');
+        await push(wsRef2, {
+          name, description: v('ws-desc'), date, location,
+          createdAt: Date.now(), parts: null
+        });
+        closeModal('modal-create-workshop');
+        clearForm(['ws-name','ws-desc','ws-date','ws-location']);
+        showToast('ワークショップを作成しました');
+      } catch (e) {
+        showToast('書き込みエラー: ' + e.message);
+        console.error(e);
+      }
     };
 
     // 複製
