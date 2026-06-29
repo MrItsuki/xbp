@@ -2,8 +2,7 @@
 // ここをあなたのFirebaseプロジェクトの設定値に書き換えてください。
 // 設定値はFirebaseコンソール > プロジェクトの設定 > 全般タブ > マイアプリ から取得できます。
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+window.FIREBASE_CONFIG = {
   apiKey: "AIzaSyC9T8Qj76wLjU9_g3cFkDJjr0lSb972Cv4",
   authDomain: "seads-40a87.firebaseapp.com",
   databaseURL: "https://seads-40a87-default-rtdb.asia-southeast1.firebasedatabase.app",

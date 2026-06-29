@@ -571,6 +571,9 @@
 <!-- トースト -->
 <div id="toast"></div>
 
+<!-- Firebase設定（モジュールより先に読み込む） -->
+<script src="./firebase-config.js"></script>
+
 <!-- Firebase SDK v10 (CDN) -->
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
@@ -579,17 +582,8 @@
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
   // ── 設定読み込み ──
-  // firebase-config.js から設定をインポート
-  // ※ ES module環境ではscriptタグのsrc属性から読む
-  let firebaseConfig;
-  try {
-    const m = await import('./firebase-config.js');
-    firebaseConfig = m.firebaseConfig ?? m.default;
-  } catch (e) {
-    console.error('firebase-config.js の読み込みに失敗しました:', e);
-    showToast('⚠ firebase-config.js が見つかりません。README を確認してください。');
-    firebaseConfig = null;
-  }
+  // firebase-config.js が window.FIREBASE_CONFIG をセットしている
+  const firebaseConfig = window.FIREBASE_CONFIG ?? null;
 
   let db;
   if (firebaseConfig && firebaseConfig.apiKey !== 'YOUR_API_KEY') {
