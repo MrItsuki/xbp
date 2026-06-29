@@ -585,7 +585,10 @@
   // firebase-config.js が window.FIREBASE_CONFIG をセットしている
   const firebaseConfig = window.FIREBASE_CONFIG ?? null;
 
+  let currentWorkshopId = null;
+  let allWorkshops = {};
   let db;
+
   if (firebaseConfig && firebaseConfig.apiKey !== 'YOUR_API_KEY') {
     try {
       const app = initializeApp(firebaseConfig);
@@ -621,8 +624,6 @@
   }
 
   // ── アプリ初期化 ──
-  let currentWorkshopId = null;
-  let allWorkshops = {};
 
   function initApp(db) {
     // ワークショップ一覧のリアルタイム監視
