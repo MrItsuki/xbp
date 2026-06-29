@@ -822,7 +822,7 @@
         </td>
         <td>${esc(p.unit)}</td>
         <td>${p.minStock}</td>
-        <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? '⚠ 不足' : '✓ OK'}</span></td>
+        <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? `⚠ ${p.minStock - p.stock}個不足` : '✓ OK'}</span></td>
         <td>
           <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
             <i class="fa-solid fa-trash"></i>
