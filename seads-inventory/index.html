@@ -748,7 +748,7 @@
         for (const p of Object.values(ws.parts)) {
           if (p.stock < p.minStock) {
             lowCount++;
-            alerts.push(`${ws.name}：${p.name}（現在 ${p.stock}${p.unit}、最低 ${p.minStock}${p.unit}）`);
+            alerts.push({ wid, text: `${ws.name}：${p.name}（現在 ${p.stock}${p.unit}、最低 ${p.minStock}${p.unit}）` });
           }
         }
       }
@@ -774,7 +774,7 @@
     // アラート表示
     if (alerts.length > 0) {
       alertSummary.style.display = 'block';
-      alertList.innerHTML = alerts.map(a => `<li>${esc(a)}</li>`).join('');
+      alertList.innerHTML = alerts.map(a => `<li style="cursor:pointer;" onclick="showDetail('${a.wid}')">${esc(a.text)}</li>`).join('');
     } else {
       alertSummary.style.display = 'none';
     }
