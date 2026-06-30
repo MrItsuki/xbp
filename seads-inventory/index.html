@@ -184,38 +184,48 @@
     .badge-past { background: #ececec; color: #777; }
     .badge-upcoming { background: var(--sub); color: var(--primary); }
 
-    /* ─── 在庫不足サマリー ─── */
-    #alert-summary {
-      background: var(--accent-light);
-      border: 1.5px solid #ffd0bc;
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      margin-bottom: 20px;
+    /* ─── 企画タブ（横スライド） ─── */
+    .tabs-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 14px;
+      -webkit-overflow-scrolling: touch;
     }
-    #alert-summary h3 {
+    .tab-chip {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 20px;
+      background: var(--white);
+      color: var(--primary);
       font-size: 14px;
-      font-weight: 700;
-      color: var(--accent);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-weight: 500;
       cursor: pointer;
-      user-select: none;
+      white-space: nowrap;
+      border: 1.5px solid var(--border);
+      transition: background 0.15s, color 0.15s;
     }
-    #alert-summary h3 .alert-toggle-icon { margin-left: auto; transition: transform 0.2s; }
-    #alert-summary.collapsed h3 { margin-bottom: 0; }
-    #alert-summary.collapsed h3 .alert-toggle-icon { transform: rotate(-90deg); }
-    #alert-summary.collapsed #alert-list { display: none; }
-    #alert-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    #alert-list li {
-      font-size: 13px;
-      color: #7a3000;
-      display: flex;
+    .tab-chip:hover { background: var(--sub); }
+    .tab-chip.active { background: var(--primary); color: var(--white); border-color: var(--primary); }
+    .tab-chip-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); margin-right: 6px; }
+    .tab-chip.active .tab-chip-dot { background: var(--white); }
+    .tab-chip-add { color: var(--text-muted); border-style: dashed; justify-content: center; width: 40px; padding: 8px; }
+
+    /* ─── ダッシュボード企画アクションバー ─── */
+    .dashboard-action-bar {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
       align-items: center;
-      gap: 6px;
+      margin-bottom: 16px;
+      padding: 10px 14px;
+      background: var(--sub);
+      border-radius: var(--radius);
     }
-    #alert-list li::before { content: "⚠"; }
+
 
     /* ─── カード（クリック可能） ─── */
     .clickable-card { cursor: pointer; transition: box-shadow 0.15s; }
@@ -433,31 +443,28 @@
 <!-- メインコンテンツ -->
 <main>
 
-  <!-- ─── 画面A: ダッシュボード（企画一覧） ─── -->
+  <!-- ─── 画面A: ダッシュボード（ワークショップ一覧） ─── -->
   <div class="screen active" id="screen-dashboard">
     <div class="section-header">
-      <h2><i class="fa-solid fa-gauge-high" style="margin-right:6px;"></i>ダッシュボード</h2>
-      <button class="btn btn-primary" id="btn-new-project">
-        <i class="fa-solid fa-plus"></i> 新しい企画
-      </button>
+      <h2><i class="fa-solid fa-people-group" style="margin-right:6px;"></i>ワークショップ</h2>
     </div>
 
-    <!-- 在庫不足サマリー -->
-    <div id="alert-summary" class="collapsed" style="display:none;">
-      <h3 onclick="toggleAlertSummary()"><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足の部品 <i class="fa-solid fa-chevron-down alert-toggle-icon"></i></h3>
-      <ul id="alert-list"></ul>
-    </div>
+    <!-- 企画タブ（横スライド） -->
+    <div class="tabs-scroll" id="project-tabs"></div>
+
+    <!-- 選択中の企画のアクション -->
+    <div class="dashboard-action-bar" id="dashboard-action-bar"></div>
 
     <!-- 最終更新 -->
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;" id="last-updated"></p>
 
-    <!-- 企画一覧 -->
-    <div id="project-list">
+    <!-- ワークショップ一覧 -->
+    <div id="workshop-list-main">
       <div class="loading"><div class="spinner"></div> 読み込み中...</div>
     </div>
   </div>
 
-  <!-- ─── 画面B: 企画詳細 ─── -->
+  <!-- ─── 画面B: 企画詳細（部品在庫の管理） ─── -->
   <div class="screen" id="screen-project">
     <div class="section-header">
       <h2 id="project-title" class="tap-edit" onclick="openEditProject()" title="タップして編集">企画詳細</h2>
@@ -479,17 +486,6 @@
       <div id="parts-container">
         <div class="loading"><div class="spinner"></div> 読み込み中...</div>
       </div>
-    </div>
-
-    <div class="section-header">
-      <h2 style="font-size:16px;"><i class="fa-solid fa-people-group" style="margin-right:6px;"></i>ワークショップ一覧</h2>
-      <button class="btn btn-primary btn-sm" id="btn-new-workshop">
-        <i class="fa-solid fa-plus"></i> ワークショップを追加
-      </button>
-    </div>
-
-    <div id="project-workshop-list">
-      <div class="loading"><div class="spinner"></div> 読み込み中...</div>
     </div>
   </div>
 
@@ -762,7 +758,6 @@
 
     // ── ボタンイベント ──
     document.getElementById('btn-back').onclick = handleBack;
-    document.getElementById('btn-new-project').onclick = () => openModal('modal-create-project');
 
     // 企画作成
     document.getElementById('btn-create-proj-submit').onclick = async () => {
@@ -843,7 +838,8 @@
     };
 
     // ワークショップ作成（参加人数に応じて自動割り振り）
-    document.getElementById('btn-new-workshop').onclick = () => {
+    window.openCreateWorkshopModal = () => {
+      if (!currentProjectId || !allProjects[currentProjectId]) { showToast('企画を選択してください'); return; }
       document.getElementById('ws-participants').value = 0;
       updateAllocationPreview();
       openModal('modal-create-workshop');
@@ -954,7 +950,7 @@
       }
       await update(ref(db), updates);
       showToast(past ? 'ワークショップを削除しました' : 'ワークショップを削除し、在庫を戻しました');
-      showProject(ws.projectId);
+      showDashboard(true);
     };
 
     renderDashboard();
@@ -979,60 +975,104 @@
     }
   }
 
+  // ── 企画タブ描画 ──
+  function renderProjectTabs() {
+    const tabsEl = document.getElementById('project-tabs');
+    let html = `<div class="tab-chip ${currentProjectId === null ? 'active' : ''}" onclick="selectProjectTab(null)">すべて</div>`;
+    for (const [pid, proj] of Object.entries(allProjects)) {
+      const hasLow = proj.parts && Object.values(proj.parts).some(p => p.stock < p.minStock);
+      html += `<div class="tab-chip ${currentProjectId === pid ? 'active' : ''}" onclick="selectProjectTab('${pid}')">${hasLow ? '<span class="tab-chip-dot"></span>' : ''}${esc(proj.name)}</div>`;
+    }
+    html += `<div class="tab-chip tab-chip-add" onclick="openModal('modal-create-project')" title="新しい企画"><i class="fa-solid fa-plus"></i></div>`;
+    tabsEl.innerHTML = html;
+  }
+
+  window.selectProjectTab = (pid) => {
+    currentProjectId = pid;
+    renderDashboard();
+  };
+
+  // ── ワークショップの部品不足を計算 ──
+  function computeShortage(ws) {
+    const project = allProjects[ws.projectId];
+    const allocations = ws.allocations || {};
+    const shortages = [];
+    for (const [pid, a] of Object.entries(allocations)) {
+      const p = project?.parts?.[pid];
+      if (p && p.stock < p.minStock) {
+        shortages.push({ name: a.name, unit: a.unit, deficit: p.minStock - p.stock });
+      }
+    }
+    return shortages;
+  }
+
+  function renderWorkshopCard(wid, ws) {
+    const past = isPast(ws);
+    const shortages = computeShortage(ws);
+    const projectName = allProjects[ws.projectId]?.name || '(企画削除済み)';
+    return `<div class="card clickable-card" onclick="showWorkshop('${wid}')">
+      <div class="card-header">
+        <div>
+          <div class="card-title">${esc(ws.name)}</div>
+          <div class="card-meta">
+            ${currentProjectId === null ? `<span class="badge badge-info" style="margin-right:6px;"><i class="fa-solid fa-folder"></i> ${esc(projectName)}</span>` : ''}
+            <i class="fa-solid fa-location-dot"></i> ${esc(ws.location || '未設定')}　<i class="fa-solid fa-calendar"></i> ${ws.date || '未設定'}
+          </div>
+        </div>
+        ${shortages.length > 0 ? `<span class="badge badge-alert"><i class="fa-solid fa-triangle-exclamation"></i> 部品不足 ${shortages.length}件</span>` : `<span class="badge badge-ok"><i class="fa-solid fa-check"></i> 材料OK</span>`}
+      </div>
+      ${shortages.length > 0 ? `<p style="font-size:13px;color:var(--accent);margin-top:8px;">${shortages.map(s => `${esc(s.name)} ${s.deficit}${esc(s.unit)}不足`).join('、')}</p>` : ''}
+      <div class="card-footer">
+        <span class="badge badge-info"><i class="fa-solid fa-people-group"></i> 参加 ${ws.participants || 0}人</span>
+        <span class="badge ${past ? 'badge-past' : 'badge-upcoming'}"><i class="fa-solid ${past ? 'fa-check' : 'fa-clock'}"></i> ${past ? '開催済み' : '開催予定'}</span>
+        <span style="font-size:12px;color:var(--text-muted);">タップして詳細を見る <i class="fa-solid fa-chevron-right"></i></span>
+      </div>
+    </div>`;
+  }
+
   // ── ダッシュボード描画 ──
   function renderDashboard() {
-    const list = document.getElementById('project-list');
-    const alertSummary = document.getElementById('alert-summary');
-    const alertList = document.getElementById('alert-list');
+    renderProjectTabs();
+
+    const actionBar = document.getElementById('dashboard-action-bar');
+    if (currentProjectId && allProjects[currentProjectId]) {
+      const proj = allProjects[currentProjectId];
+      actionBar.style.display = 'flex';
+      actionBar.innerHTML = `
+        <strong style="margin-right:4px;color:var(--primary-dark);">${esc(proj.name)}</strong>
+        <button class="btn btn-secondary btn-sm" onclick="showProject('${currentProjectId}')"><i class="fa-solid fa-boxes-stacked"></i> 部品在庫を管理</button>
+        <button class="btn btn-primary btn-sm" onclick="openCreateWorkshopModal()"><i class="fa-solid fa-plus"></i> ワークショップを追加</button>
+      `;
+    } else {
+      actionBar.style.display = 'none';
+      actionBar.innerHTML = '';
+    }
+
+    const listEl = document.getElementById('workshop-list-main');
 
     if (Object.keys(allProjects).length === 0) {
-      list.innerHTML = `<div class="empty-state">
+      listEl.innerHTML = `<div class="empty-state">
         <i class="fa-solid fa-box-open"></i>
-        <p>企画がまだありません。<br>「新しい企画」から作成してください。</p>
+        <p>企画がまだありません。<br>タブの「＋」から作成してください。</p>
       </div>`;
-      alertSummary.style.display = 'none';
       return;
     }
 
-    const alerts = [];
-    let html = '';
+    const entries = Object.entries(allWorkshops).filter(([, ws]) => currentProjectId === null || ws.projectId === currentProjectId);
 
-    for (const [pid, proj] of Object.entries(allProjects)) {
-      let lowCount = 0;
-      if (proj.parts) {
-        for (const p of Object.values(proj.parts)) {
-          if (p.stock < p.minStock) {
-            lowCount++;
-            alerts.push({ pid, text: `${proj.name}：${p.name}（現在 ${p.stock}${p.unit}、最低 ${p.minStock}${p.unit}）` });
-          }
-        }
-      }
-      const partCount = proj.parts ? Object.keys(proj.parts).length : 0;
-      const wsCount = Object.values(allWorkshops).filter(w => w.projectId === pid).length;
-      html += `<div class="card clickable-card" onclick="showProject('${pid}')">
-        <div class="card-header">
-          <div>
-            <div class="card-title">${esc(proj.name)}</div>
-          </div>
-          ${lowCount > 0 ? `<span class="badge badge-alert"><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足 ${lowCount}件</span>` : `<span class="badge badge-ok"><i class="fa-solid fa-check"></i> 在庫OK</span>`}
-        </div>
-        ${proj.description ? `<p style="font-size:13px;color:var(--text-muted);margin-top:8px;">${esc(proj.description)}</p>` : ''}
-        <div class="card-footer">
-          <span class="badge badge-info"><i class="fa-solid fa-boxes-stacked"></i> 部品 ${partCount}種</span>
-          <span class="badge badge-info"><i class="fa-solid fa-people-group"></i> ワークショップ ${wsCount}件</span>
-          <span style="font-size:12px;color:var(--text-muted);">タップして詳細を見る <i class="fa-solid fa-chevron-right"></i></span>
-        </div>
+    if (entries.length === 0) {
+      listEl.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-people-group"></i>
+        <p>${currentProjectId === null ? 'ワークショップがまだありません。' : '企画を選択して「ワークショップを追加」から登録してください。'}</p>
       </div>`;
+      return;
     }
 
-    list.innerHTML = html;
+    const upcoming = entries.filter(([, ws]) => !isPast(ws)).sort((a, b) => (a[1].date || '').localeCompare(b[1].date || ''));
+    const past = entries.filter(([, ws]) => isPast(ws)).sort((a, b) => (b[1].date || '').localeCompare(a[1].date || ''));
+    const ordered = [...upcoming, ...past];
 
-    if (alerts.length > 0) {
-      alertSummary.style.display = 'block';
-      alertList.innerHTML = alerts.map(a => `<li style="cursor:pointer;" onclick="showProject('${a.pid}')">${esc(a.text)}</li>`).join('');
-    } else {
-      alertSummary.style.display = 'none';
-    }
+    listEl.innerHTML = ordered.map(([wid, ws]) => renderWorkshopCard(wid, ws)).join('');
   }
 
   // ── 企画詳細描画 ──
@@ -1098,34 +1138,6 @@
         <tbody>${rows}</tbody>
       </table>`;
     }
-
-    const wsList = document.getElementById('project-workshop-list');
-    const workshops = Object.entries(allWorkshops).filter(([, w]) => w.projectId === pid);
-    if (workshops.length === 0) {
-      wsList.innerHTML = `<div class="empty-state">
-        <i class="fa-solid fa-people-group"></i>
-        <p>まだワークショップがありません。「ワークショップを追加」から登録してください。</p>
-      </div>`;
-      return;
-    }
-    let wsHtml = '';
-    for (const [wid, ws] of workshops) {
-      const past = isPast(ws);
-      wsHtml += `<div class="card clickable-card" onclick="showWorkshop('${wid}')">
-        <div class="card-header">
-          <div>
-            <div class="card-title">${esc(ws.name)}</div>
-            <div class="card-meta"><i class="fa-solid fa-location-dot"></i> ${esc(ws.location || '未設定')}　<i class="fa-solid fa-calendar"></i> ${ws.date || '未設定'}</div>
-          </div>
-          <span class="badge ${past ? 'badge-past' : 'badge-upcoming'}"><i class="fa-solid ${past ? 'fa-check' : 'fa-clock'}"></i> ${past ? '開催済み' : '開催予定'}</span>
-        </div>
-        <div class="card-footer">
-          <span class="badge badge-info"><i class="fa-solid fa-people-group"></i> 参加 ${ws.participants || 0}人</span>
-          <span style="font-size:12px;color:var(--text-muted);">タップして詳細を見る <i class="fa-solid fa-chevron-right"></i></span>
-        </div>
-      </div>`;
-    }
-    wsList.innerHTML = wsHtml;
   }
 
   // ── ワークショップ詳細描画 ──
@@ -1225,8 +1237,8 @@
     renderWorkshop(wid);
   };
 
-  function showDashboard() {
-    currentProjectId = null;
+  function showDashboard(preserveProjectId) {
+    if (!preserveProjectId) currentProjectId = null;
     currentWorkshopId = null;
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-dashboard').classList.add('active');
@@ -1236,16 +1248,13 @@
   }
 
   function handleBack() {
-    if (document.getElementById('screen-workshop').classList.contains('active')) {
-      showProject(currentProjectId);
-    } else {
-      showDashboard();
-    }
+    // screen-project / screen-workshop ではすでに currentProjectId がセット済みなので維持する
+    showDashboard(true);
   }
 
   // ── デモモード ──
   function renderDemoMode() {
-    document.getElementById('project-list').innerHTML = `<div class="card" style="border:2px dashed var(--accent);">
+    document.getElementById('workshop-list-main').innerHTML = `<div class="card" style="border:2px dashed var(--accent);">
       <p style="font-size:14px;color:var(--accent);font-weight:700;margin-bottom:8px;">
         <i class="fa-solid fa-info-circle"></i> デモモード（Firebase未接続）
       </p>
@@ -1266,10 +1275,6 @@
     const el = document.getElementById('last-updated');
     el.textContent = `最終確認: ${new Date().toLocaleString('ja-JP')}`;
   }
-
-  window.toggleAlertSummary = () => {
-    document.getElementById('alert-summary').classList.toggle('collapsed');
-  };
 
   window.openModal = (id) => {
     if (id === 'modal-create-workshop') updateAllocationPreview();
