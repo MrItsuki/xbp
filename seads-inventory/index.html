@@ -202,7 +202,13 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      cursor: pointer;
+      user-select: none;
     }
+    #alert-summary h3 .alert-toggle-icon { margin-left: auto; transition: transform 0.2s; }
+    #alert-summary.collapsed h3 { margin-bottom: 0; }
+    #alert-summary.collapsed h3 .alert-toggle-icon { transform: rotate(-90deg); }
+    #alert-summary.collapsed #alert-list { display: none; }
     #alert-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
     #alert-list li {
       font-size: 13px;
@@ -433,7 +439,7 @@
 
     <!-- 在庫不足サマリー -->
     <div id="alert-summary" style="display:none;">
-      <h3><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足の部品</h3>
+      <h3 onclick="toggleAlertSummary()"><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足の部品 <i class="fa-solid fa-chevron-down alert-toggle-icon"></i></h3>
       <ul id="alert-list"></ul>
     </div>
 
@@ -905,6 +911,10 @@
     const el = document.getElementById('last-updated');
     el.textContent = `最終確認: ${new Date().toLocaleString('ja-JP')}`;
   }
+
+  window.toggleAlertSummary = () => {
+    document.getElementById('alert-summary').classList.toggle('collapsed');
+  };
 
   window.openModal = (id) => document.getElementById(id).classList.add('open');
   window.closeModal = (id) => document.getElementById(id).classList.remove('open');
