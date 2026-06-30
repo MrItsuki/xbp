@@ -46,11 +46,6 @@
       z-index: 100;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    header img.logo {
-      height: 32px;
-      width: 32px;
-      object-fit: contain;
-    }
     header .logo-placeholder {
       width: 32px;
       height: 32px;
@@ -152,6 +147,7 @@
       font-size: 18px;
     }
     .btn-icon.btn-sm { width: 36px; height: 36px; font-size: 15px; }
+    .btn[disabled] { opacity: 0.45; cursor: not-allowed; }
 
     /* ─── カード ─── */
     .card {
@@ -185,6 +181,8 @@
     .badge-alert { background: var(--accent); color: var(--white); }
     .badge-ok { background: #E8F5E9; color: #2e7d32; }
     .badge-info { background: var(--sub); color: var(--primary); }
+    .badge-past { background: #ececec; color: #777; }
+    .badge-upcoming { background: var(--sub); color: var(--primary); }
 
     /* ─── 在庫不足サマリー ─── */
     #alert-summary {
@@ -219,20 +217,22 @@
     }
     #alert-list li::before { content: "⚠"; }
 
-    /* ─── ワークショップカード ─── */
-    .workshop-card { cursor: pointer; transition: box-shadow 0.15s; }
-    .workshop-card:hover { box-shadow: 0 4px 20px rgba(0,88,169,0.15); }
-    .workshop-card .card-footer {
+    /* ─── カード（クリック可能） ─── */
+    .clickable-card { cursor: pointer; transition: box-shadow 0.15s; }
+    .clickable-card:hover { box-shadow: 0 4px 20px rgba(0,88,169,0.15); }
+    .clickable-card .card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-top: 12px;
       padding-top: 10px;
       border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 6px;
     }
 
-    /* ─── ワークショップ詳細 ─── */
-    .workshop-info {
+    /* ─── 詳細情報 ─── */
+    .info-box {
       background: var(--sub);
       border-radius: var(--radius);
       padding: 14px 16px;
@@ -241,14 +241,14 @@
       flex-wrap: wrap;
       gap: 12px;
     }
-    .workshop-info-item {
+    .info-item {
       display: flex;
       align-items: center;
       gap: 6px;
       font-size: 14px;
       color: var(--primary-dark);
     }
-    .workshop-info-item i { font-size: 13px; opacity: 0.7; }
+    .info-item i { font-size: 13px; opacity: 0.7; }
 
     /* ─── タップ編集 ─── */
     .tap-edit { cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color 0.15s; }
@@ -354,6 +354,7 @@
     }
     .form-group input:focus,
     .form-group textarea:focus { border-color: var(--primary); }
+    .form-group .hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
     .form-row { display: flex; gap: 10px; }
     .form-row .form-group { flex: 1; }
     .modal-actions { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
@@ -432,12 +433,12 @@
 <!-- メインコンテンツ -->
 <main>
 
-  <!-- ─── 画面A: ダッシュボード ─── -->
+  <!-- ─── 画面A: ダッシュボード（企画一覧） ─── -->
   <div class="screen active" id="screen-dashboard">
     <div class="section-header">
       <h2><i class="fa-solid fa-gauge-high" style="margin-right:6px;"></i>ダッシュボード</h2>
-      <button class="btn btn-primary" id="btn-new-workshop">
-        <i class="fa-solid fa-plus"></i> 新しいワークショップ
+      <button class="btn btn-primary" id="btn-new-project">
+        <i class="fa-solid fa-plus"></i> 新しい企画
       </button>
     </div>
 
@@ -450,30 +451,25 @@
     <!-- 最終更新 -->
     <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;" id="last-updated"></p>
 
-    <!-- ワークショップ一覧 -->
-    <div id="workshop-list">
+    <!-- 企画一覧 -->
+    <div id="project-list">
       <div class="loading"><div class="spinner"></div> 読み込み中...</div>
     </div>
   </div>
 
-  <!-- ─── 画面B: ワークショップ詳細 ─── -->
-  <div class="screen" id="screen-detail">
+  <!-- ─── 画面B: 企画詳細 ─── -->
+  <div class="screen" id="screen-project">
     <div class="section-header">
-      <h2 id="detail-title" class="tap-edit" onclick="window.openEditWorkshop && window.openEditWorkshop()" title="タップして編集">ワークショップ詳細</h2>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-sm" id="btn-duplicate">
-          <i class="fa-solid fa-copy"></i> 複製
-        </button>
-        <button class="btn btn-danger btn-sm" id="btn-delete-workshop">
-          <i class="fa-solid fa-trash"></i> 削除
-        </button>
-      </div>
+      <h2 id="project-title" class="tap-edit" onclick="openEditProject()" title="タップして編集">企画詳細</h2>
+      <button class="btn btn-danger btn-sm" id="btn-delete-project">
+        <i class="fa-solid fa-trash"></i> 企画を削除
+      </button>
     </div>
 
-    <div class="workshop-info" id="detail-info"></div>
+    <div class="info-box" id="project-info"></div>
 
     <div class="section-header">
-      <h2 style="font-size:16px;"><i class="fa-solid fa-boxes-stacked" style="margin-right:6px;"></i>部品一覧</h2>
+      <h2 style="font-size:16px;"><i class="fa-solid fa-boxes-stacked" style="margin-right:6px;"></i>部品在庫</h2>
       <button class="btn btn-primary btn-sm" id="btn-add-part">
         <i class="fa-solid fa-plus"></i> 部品を追加
       </button>
@@ -484,14 +480,150 @@
         <div class="loading"><div class="spinner"></div> 読み込み中...</div>
       </div>
     </div>
+
+    <div class="section-header">
+      <h2 style="font-size:16px;"><i class="fa-solid fa-people-group" style="margin-right:6px;"></i>ワークショップ一覧</h2>
+      <button class="btn btn-primary btn-sm" id="btn-new-workshop">
+        <i class="fa-solid fa-plus"></i> ワークショップを追加
+      </button>
+    </div>
+
+    <div id="project-workshop-list">
+      <div class="loading"><div class="spinner"></div> 読み込み中...</div>
+    </div>
+  </div>
+
+  <!-- ─── 画面C: ワークショップ詳細 ─── -->
+  <div class="screen" id="screen-workshop">
+    <div class="section-header">
+      <h2 id="workshop-title">ワークショップ詳細</h2>
+      <button class="btn btn-danger btn-sm" id="btn-delete-workshop">
+        <i class="fa-solid fa-trash"></i> 削除
+      </button>
+    </div>
+
+    <div class="info-box" id="workshop-info"></div>
+
+    <div class="section-header">
+      <h2 style="font-size:16px;"><i class="fa-solid fa-boxes-stacked" style="margin-right:6px;"></i>割り振られた部品</h2>
+    </div>
+
+    <div class="card parts-table-wrap">
+      <div id="allocations-container">
+        <div class="loading"><div class="spinner"></div> 読み込み中...</div>
+      </div>
+    </div>
   </div>
 
 </main>
 
+<!-- ─── モーダル: 企画作成 ─── -->
+<div class="modal-overlay" id="modal-create-project">
+  <div class="modal">
+    <h2><i class="fa-solid fa-plus-circle" style="margin-right:8px;"></i>企画を作成</h2>
+    <div class="form-group">
+      <label>企画名 *</label>
+      <input type="text" id="proj-name" placeholder="例: 段ボール工作教室" />
+    </div>
+    <div class="form-group">
+      <label>説明</label>
+      <textarea id="proj-desc" rows="2" placeholder="内容の概要を入力"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-create-project')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-create-proj-submit"><i class="fa-solid fa-check"></i> 作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── モーダル: 企画編集 ─── -->
+<div class="modal-overlay" id="modal-edit-project">
+  <div class="modal">
+    <h2><i class="fa-solid fa-pen" style="margin-right:8px;"></i>企画を編集</h2>
+    <div class="form-group">
+      <label>企画名 *</label>
+      <input type="text" id="edit-proj-name" placeholder="例: 段ボール工作教室" />
+    </div>
+    <div class="form-group">
+      <label>説明</label>
+      <textarea id="edit-proj-desc" rows="2" placeholder="内容の概要を入力"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-project')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-edit-proj-submit"><i class="fa-solid fa-check"></i> 保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── モーダル: 部品追加 ─── -->
+<div class="modal-overlay" id="modal-add-part">
+  <div class="modal">
+    <h2><i class="fa-solid fa-box-open" style="margin-right:8px;"></i>部品を追加</h2>
+    <div class="form-group">
+      <label>部品名 *</label>
+      <input type="text" id="part-name" placeholder="例: PLA フィラメント（白）" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>単位 *</label>
+        <input type="text" id="part-unit" placeholder="例: 個・m・g" />
+      </div>
+      <div class="form-group">
+        <label>初期在庫数 *</label>
+        <input type="number" id="part-stock" min="0" value="0" />
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>最低在庫数（これを下回ると警告）</label>
+        <input type="number" id="part-min-stock" min="0" value="1" />
+      </div>
+      <div class="form-group">
+        <label>参加者1人あたりの必要数 *</label>
+        <input type="number" id="part-per-participant" min="0" value="1" />
+      </div>
+    </div>
+    <p class="hint" style="margin-bottom:14px;">ワークショップ作成時、参加人数 × この数だけ自動で在庫から差し引かれます。</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-add-part')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-add-part-submit"><i class="fa-solid fa-check"></i> 追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── モーダル: 部品編集 ─── -->
+<div class="modal-overlay" id="modal-edit-part">
+  <div class="modal">
+    <h2><i class="fa-solid fa-pen" style="margin-right:8px;"></i>部品を編集</h2>
+    <div class="form-group">
+      <label>部品名 *</label>
+      <input type="text" id="edit-part-name" placeholder="例: PLA フィラメント（白）" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>単位 *</label>
+        <input type="text" id="edit-part-unit" placeholder="例: 個・m・g" />
+      </div>
+      <div class="form-group">
+        <label>最低在庫数</label>
+        <input type="number" id="edit-part-min-stock" min="0" />
+      </div>
+    </div>
+    <div class="form-group">
+      <label>参加者1人あたりの必要数 *</label>
+      <input type="number" id="edit-part-per-participant" min="0" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-part')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-edit-part-submit"><i class="fa-solid fa-check"></i> 保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- ─── モーダル: ワークショップ作成 ─── -->
 <div class="modal-overlay" id="modal-create-workshop">
   <div class="modal">
-    <h2><i class="fa-solid fa-plus-circle" style="margin-right:8px;"></i>ワークショップ作成</h2>
+    <h2><i class="fa-solid fa-plus-circle" style="margin-right:8px;"></i>ワークショップを追加</h2>
     <div class="form-group">
       <label>ワークショップ名 *</label>
       <input type="text" id="ws-name" placeholder="例: 夏のものづくり教室" />
@@ -510,6 +642,11 @@
         <input type="text" id="ws-location" placeholder="例: 横浜市立〇〇小学校" />
       </div>
     </div>
+    <div class="form-group">
+      <label>参加人数 *</label>
+      <input type="number" id="ws-participants" min="0" value="0" />
+    </div>
+    <p class="hint" id="ws-allocation-preview" style="margin-bottom:14px;"></p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('modal-create-workshop')">キャンセル</button>
       <button class="btn btn-primary" id="btn-create-ws-submit"><i class="fa-solid fa-check"></i> 作成</button>
@@ -539,95 +676,14 @@
         <input type="text" id="edit-ws-location" placeholder="例: 横浜市立〇〇小学校" />
       </div>
     </div>
+    <div class="form-group">
+      <label>参加人数 *</label>
+      <input type="number" id="edit-ws-participants" min="0" />
+    </div>
+    <p class="hint" style="margin-bottom:14px;">参加人数を変更すると、企画倉庫の在庫が自動で再計算されます。</p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('modal-edit-workshop')">キャンセル</button>
       <button class="btn btn-primary" id="btn-edit-ws-submit"><i class="fa-solid fa-check"></i> 保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── モーダル: ワークショップ複製 ─── -->
-<div class="modal-overlay" id="modal-duplicate-workshop">
-  <div class="modal">
-    <h2><i class="fa-solid fa-copy" style="margin-right:8px;"></i>ワークショップを複製</h2>
-    <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-      部品の種類・名前・最低在庫数はそのまま引き継ぎます。在庫数は0にリセットします。
-    </p>
-    <div class="form-group">
-      <label>新しいワークショップ名 *</label>
-      <input type="text" id="dup-name" placeholder="例: 夏のものづくり教室（大和会場）" />
-    </div>
-    <div class="form-group">
-      <label>説明</label>
-      <textarea id="dup-desc" rows="2"></textarea>
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>開催日 *</label>
-        <input type="date" id="dup-date" />
-      </div>
-      <div class="form-group">
-        <label>新しい開催地 *</label>
-        <input type="text" id="dup-location" placeholder="例: 川崎市立〇〇小学校" />
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('modal-duplicate-workshop')">キャンセル</button>
-      <button class="btn btn-primary" id="btn-dup-submit"><i class="fa-solid fa-copy"></i> 複製して作成</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── モーダル: 部品追加 ─── -->
-<div class="modal-overlay" id="modal-add-part">
-  <div class="modal">
-    <h2><i class="fa-solid fa-box-open" style="margin-right:8px;"></i>部品を追加</h2>
-    <div class="form-group">
-      <label>部品名 *</label>
-      <input type="text" id="part-name" placeholder="例: PLA フィラメント（白）" />
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>単位 *</label>
-        <input type="text" id="part-unit" placeholder="例: 個・m・g" />
-      </div>
-      <div class="form-group">
-        <label>初期在庫数 *</label>
-        <input type="number" id="part-stock" min="0" value="0" />
-      </div>
-    </div>
-    <div class="form-group">
-      <label>最低在庫数（これを下回ると警告）</label>
-      <input type="number" id="part-min-stock" min="0" value="1" />
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('modal-add-part')">キャンセル</button>
-      <button class="btn btn-primary" id="btn-add-part-submit"><i class="fa-solid fa-check"></i> 追加</button>
-    </div>
-  </div>
-</div>
-
-<!-- ─── モーダル: 部品編集 ─── -->
-<div class="modal-overlay" id="modal-edit-part">
-  <div class="modal">
-    <h2><i class="fa-solid fa-pen" style="margin-right:8px;"></i>部品を編集</h2>
-    <div class="form-group">
-      <label>部品名 *</label>
-      <input type="text" id="edit-part-name" placeholder="例: PLA フィラメント（白）" />
-    </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label>単位 *</label>
-        <input type="text" id="edit-part-unit" placeholder="例: 個・m・g" />
-      </div>
-      <div class="form-group">
-        <label>最低在庫数</label>
-        <input type="number" id="edit-part-min-stock" min="0" />
-      </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-secondary" onclick="closeModal('modal-edit-part')">キャンセル</button>
-      <button class="btn btn-primary" id="btn-edit-part-submit"><i class="fa-solid fa-check"></i> 保存</button>
     </div>
   </div>
 </div>
@@ -642,15 +698,17 @@
 <script type="module">
   import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
   import {
-    getDatabase, ref, onValue, set, push, remove, update, serverTimestamp, onDisconnect
+    getDatabase, ref, onValue, push, remove, update
   } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
 
   // ── 設定読み込み ──
   // firebase-config.js が window.FIREBASE_CONFIG をセットしている
   const firebaseConfig = window.FIREBASE_CONFIG ?? null;
 
+  let currentProjectId = null;
   let currentWorkshopId = null;
   let currentEditPartId = null;
+  let allProjects = {};
   let allWorkshops = {};
   let db;
 
@@ -691,70 +749,65 @@
   // ── アプリ初期化 ──
 
   function initApp(db) {
-    // ワークショップ一覧のリアルタイム監視
-    const wsRef = ref(db, 'workshops');
-    onValue(wsRef, snap => {
+    onValue(ref(db, 'projects'), snap => {
+      allProjects = snap.val() || {};
+      rerenderCurrentScreen();
+      updateLastUpdated();
+    });
+    onValue(ref(db, 'workshops'), snap => {
       allWorkshops = snap.val() || {};
-      if (document.getElementById('screen-dashboard').classList.contains('active')) {
-        renderDashboard();
-      } else if (currentWorkshopId) {
-        renderDetail(currentWorkshopId);
-      }
+      rerenderCurrentScreen();
       updateLastUpdated();
     });
 
     // ── ボタンイベント ──
-    document.getElementById('btn-new-workshop').onclick = () => openModal('modal-create-workshop');
-    document.getElementById('btn-back').onclick = showDashboard;
+    document.getElementById('btn-back').onclick = handleBack;
+    document.getElementById('btn-new-project').onclick = () => openModal('modal-create-project');
 
-    // ワークショップ作成
-    document.getElementById('btn-create-ws-submit').onclick = async () => {
-      const name = v('ws-name');
-      const location = v('ws-location');
-      const date = v('ws-date');
-      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
+    // 企画作成
+    document.getElementById('btn-create-proj-submit').onclick = async () => {
+      const name = v('proj-name');
+      if (!name) { showToast('企画名は必須です'); return; }
       try {
-        const wsRef2 = ref(db, 'workshops');
-        await push(wsRef2, {
-          name, description: v('ws-desc'), date, location,
-          createdAt: Date.now(), parts: null
+        await push(ref(db, 'projects'), {
+          name, description: v('proj-desc'), createdAt: Date.now(), parts: null
         });
-        closeModal('modal-create-workshop');
-        clearForm(['ws-name','ws-desc','ws-date','ws-location']);
-        showToast('ワークショップを作成しました');
+        closeModal('modal-create-project');
+        clearForm(['proj-name', 'proj-desc']);
+        showToast('企画を作成しました');
       } catch (e) {
         showToast('書き込みエラー: ' + e.message);
         console.error(e);
       }
     };
 
-    // 複製
-    document.getElementById('btn-dup-submit').onclick = async () => {
-      const name = v('dup-name');
-      const location = v('dup-location');
-      const date = v('dup-date');
-      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
-      const src = allWorkshops[currentWorkshopId];
-      const newParts = {};
-      if (src.parts) {
-        for (const [pid, p] of Object.entries(src.parts)) {
-          newParts[pid] = { name: p.name, unit: p.unit, stock: 0, minStock: p.minStock, updatedAt: Date.now() };
-        }
-      }
-      await push(ref(db, 'workshops'), {
-        name, description: v('dup-desc'), date, location,
-        createdAt: Date.now(),
-        parts: Object.keys(newParts).length ? newParts : null
+    // 企画編集
+    window.openEditProject = () => {
+      const src = allProjects[currentProjectId];
+      if (!src) return;
+      document.getElementById('edit-proj-name').value = src.name || '';
+      document.getElementById('edit-proj-desc').value = src.description || '';
+      openModal('modal-edit-project');
+    };
+    document.getElementById('btn-edit-proj-submit').onclick = async () => {
+      const name = v('edit-proj-name');
+      if (!name) { showToast('企画名は必須です'); return; }
+      await update(ref(db, `projects/${currentProjectId}`), {
+        name, description: v('edit-proj-desc')
       });
-      closeModal('modal-duplicate-workshop');
-      showToast('ワークショップを複製しました');
+      closeModal('modal-edit-project');
+      showToast('企画を更新しました');
     };
 
-    // ワークショップ削除
-    document.getElementById('btn-delete-workshop').onclick = async () => {
-      if (!confirm('このワークショップを削除しますか？部品データもすべて削除されます。')) return;
-      await remove(ref(db, `workshops/${currentWorkshopId}`));
-      showToast('ワークショップを削除しました');
+    // 企画削除（紐づくワークショップも一緒に削除）
+    document.getElementById('btn-delete-project').onclick = async () => {
+      if (!confirm('この企画を削除しますか？部品在庫と、紐づくワークショップもすべて削除されます。')) return;
+      const updates = { [`projects/${currentProjectId}`]: null };
+      for (const [wid, ws] of Object.entries(allWorkshops)) {
+        if (ws.projectId === currentProjectId) updates[`workshops/${wid}`] = null;
+      }
+      await update(ref(db), updates);
+      showToast('企画を削除しました');
       showDashboard();
     };
 
@@ -765,46 +818,14 @@
       const unit = v('part-unit');
       if (!name || !unit) { showToast('部品名と単位は必須です'); return; }
       const stock = parseInt(v('part-stock')) || 0;
-      const minStock = parseInt(v('part-min-stock')) || 1;
-      await push(ref(db, `workshops/${currentWorkshopId}/parts`), {
-        name, unit, stock, minStock, updatedAt: Date.now()
+      const minStock = parseInt(v('part-min-stock')) || 0;
+      const perParticipant = parseInt(v('part-per-participant')) || 0;
+      await push(ref(db, `projects/${currentProjectId}/parts`), {
+        name, unit, stock, minStock, perParticipant, updatedAt: Date.now()
       });
       closeModal('modal-add-part');
-      clearForm(['part-name','part-unit','part-stock','part-min-stock']);
+      clearForm(['part-name', 'part-unit', 'part-stock', 'part-min-stock', 'part-per-participant']);
       showToast('部品を追加しました');
-    };
-
-    // 複製ボタン
-    document.getElementById('btn-duplicate').onclick = () => {
-      const src = allWorkshops[currentWorkshopId];
-      if (!src) return;
-      document.getElementById('dup-name').value = src.name + '（コピー）';
-      document.getElementById('dup-desc').value = src.description || '';
-      document.getElementById('dup-date').value = src.date || '';
-      document.getElementById('dup-location').value = '';
-      openModal('modal-duplicate-workshop');
-    };
-
-    // ワークショップ編集
-    window.openEditWorkshop = () => {
-      const src = allWorkshops[currentWorkshopId];
-      if (!src) return;
-      document.getElementById('edit-ws-name').value = src.name || '';
-      document.getElementById('edit-ws-desc').value = src.description || '';
-      document.getElementById('edit-ws-date').value = src.date || '';
-      document.getElementById('edit-ws-location').value = src.location || '';
-      openModal('modal-edit-workshop');
-    };
-    document.getElementById('btn-edit-ws-submit').onclick = async () => {
-      const name = v('edit-ws-name');
-      const location = v('edit-ws-location');
-      const date = v('edit-ws-date');
-      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
-      await update(ref(db, `workshops/${currentWorkshopId}`), {
-        name, description: v('edit-ws-desc'), date, location
-      });
-      closeModal('modal-edit-workshop');
-      showToast('ワークショップを更新しました');
     };
 
     // 部品編集
@@ -813,57 +834,192 @@
       const unit = v('edit-part-unit');
       if (!name || !unit) { showToast('部品名と単位は必須です'); return; }
       const minStock = parseInt(v('edit-part-min-stock')) || 0;
-      await update(ref(db, `workshops/${currentWorkshopId}/parts/${currentEditPartId}`), {
-        name, unit, minStock, updatedAt: Date.now()
+      const perParticipant = parseInt(v('edit-part-per-participant')) || 0;
+      await update(ref(db, `projects/${currentProjectId}/parts/${currentEditPartId}`), {
+        name, unit, minStock, perParticipant, updatedAt: Date.now()
       });
       closeModal('modal-edit-part');
       showToast('部品を更新しました');
     };
 
+    // ワークショップ作成（参加人数に応じて自動割り振り）
+    document.getElementById('btn-new-workshop').onclick = () => {
+      document.getElementById('ws-participants').value = 0;
+      updateAllocationPreview();
+      openModal('modal-create-workshop');
+    };
+    document.getElementById('ws-participants').oninput = updateAllocationPreview;
+
+    document.getElementById('btn-create-ws-submit').onclick = async () => {
+      const name = v('ws-name');
+      const location = v('ws-location');
+      const date = v('ws-date');
+      const participants = Math.max(0, parseInt(v('ws-participants')) || 0);
+      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
+
+      const project = allProjects[currentProjectId];
+      const parts = project.parts || {};
+      const allocations = {};
+      const updates = {};
+
+      for (const [pid, p] of Object.entries(parts)) {
+        const allocated = (p.perParticipant || 0) * participants;
+        allocations[pid] = { name: p.name, unit: p.unit, allocated };
+        updates[`projects/${currentProjectId}/parts/${pid}/stock`] = (p.stock || 0) - allocated;
+      }
+
+      const newWsRef = push(ref(db, 'workshops'));
+      updates[`workshops/${newWsRef.key}`] = {
+        projectId: currentProjectId, name, description: v('ws-desc'), date, location,
+        participants, createdAt: Date.now(),
+        allocations: Object.keys(allocations).length ? allocations : null
+      };
+
+      try {
+        await update(ref(db), updates);
+        closeModal('modal-create-workshop');
+        clearForm(['ws-name', 'ws-desc', 'ws-date', 'ws-location']);
+        showToast('ワークショップを作成し、部品を割り振りました');
+      } catch (e) {
+        showToast('書き込みエラー: ' + e.message);
+        console.error(e);
+      }
+    };
+
+    // ワークショップ編集（参加人数変更で在庫を再計算）
+    window.openEditWorkshop = () => {
+      const ws = allWorkshops[currentWorkshopId];
+      if (!ws) return;
+      if (isPast(ws)) { showToast('開催日を過ぎたワークショップは編集できません'); return; }
+      document.getElementById('edit-ws-name').value = ws.name || '';
+      document.getElementById('edit-ws-desc').value = ws.description || '';
+      document.getElementById('edit-ws-date').value = ws.date || '';
+      document.getElementById('edit-ws-location').value = ws.location || '';
+      document.getElementById('edit-ws-participants').value = ws.participants || 0;
+      openModal('modal-edit-workshop');
+    };
+    document.getElementById('btn-edit-ws-submit').onclick = async () => {
+      const ws = allWorkshops[currentWorkshopId];
+      const name = v('edit-ws-name');
+      const location = v('edit-ws-location');
+      const date = v('edit-ws-date');
+      const participants = Math.max(0, parseInt(v('edit-ws-participants')) || 0);
+      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
+
+      const project = allProjects[ws.projectId] || {};
+      const parts = project.parts || {};
+      const oldAllocations = ws.allocations || {};
+      const newAllocations = {};
+      const updates = {};
+
+      for (const [pid, p] of Object.entries(parts)) {
+        const newAllocated = (p.perParticipant || 0) * participants;
+        const oldAllocated = oldAllocations[pid]?.allocated || 0;
+        const delta = newAllocated - oldAllocated;
+        newAllocations[pid] = { name: p.name, unit: p.unit, allocated: newAllocated };
+        if (delta !== 0) {
+          updates[`projects/${ws.projectId}/parts/${pid}/stock`] = (p.stock || 0) - delta;
+        }
+      }
+
+      updates[`workshops/${currentWorkshopId}/name`] = name;
+      updates[`workshops/${currentWorkshopId}/description`] = v('edit-ws-desc');
+      updates[`workshops/${currentWorkshopId}/date`] = date;
+      updates[`workshops/${currentWorkshopId}/location`] = location;
+      updates[`workshops/${currentWorkshopId}/participants`] = participants;
+      updates[`workshops/${currentWorkshopId}/allocations`] = Object.keys(newAllocations).length ? newAllocations : null;
+
+      await update(ref(db), updates);
+      closeModal('modal-edit-workshop');
+      showToast('ワークショップを更新し、在庫を再計算しました');
+    };
+
+    // ワークショップ削除（開催日基準で在庫を返却するか判定）
+    document.getElementById('btn-delete-workshop').onclick = async () => {
+      const ws = allWorkshops[currentWorkshopId];
+      if (!ws) return;
+      const past = isPast(ws);
+      const msg = past
+        ? 'このワークショップを削除しますか？開催日を過ぎているため、割り振り済みの部品は企画在庫に戻りません。'
+        : 'このワークショップを削除しますか？割り振られていた部品は企画在庫に戻ります。';
+      if (!confirm(msg)) return;
+
+      const updates = { [`workshops/${currentWorkshopId}`]: null };
+      if (!past && ws.allocations) {
+        const project = allProjects[ws.projectId];
+        for (const [pid, a] of Object.entries(ws.allocations)) {
+          const p = project?.parts?.[pid];
+          if (p) updates[`projects/${ws.projectId}/parts/${pid}/stock`] = (p.stock || 0) + (a.allocated || 0);
+        }
+      }
+      await update(ref(db), updates);
+      showToast(past ? 'ワークショップを削除しました' : 'ワークショップを削除し、在庫を戻しました');
+      showProject(ws.projectId);
+    };
+
     renderDashboard();
+  }
+
+  function updateAllocationPreview() {
+    const participants = Math.max(0, parseInt(v('ws-participants')) || 0);
+    const project = allProjects[currentProjectId];
+    const parts = project?.parts || {};
+    const preview = document.getElementById('ws-allocation-preview');
+    const entries = Object.values(parts).map(p => `${esc(p.name)} ${(p.perParticipant || 0) * participants}${esc(p.unit)}`);
+    preview.textContent = entries.length ? `割り振り予定: ${entries.join('、')}` : '部品が登録されていません。';
+  }
+
+  function rerenderCurrentScreen() {
+    if (document.getElementById('screen-dashboard').classList.contains('active')) {
+      renderDashboard();
+    } else if (document.getElementById('screen-project').classList.contains('active') && currentProjectId) {
+      renderProject(currentProjectId);
+    } else if (document.getElementById('screen-workshop').classList.contains('active') && currentWorkshopId) {
+      renderWorkshop(currentWorkshopId);
+    }
   }
 
   // ── ダッシュボード描画 ──
   function renderDashboard() {
-    const list = document.getElementById('workshop-list');
+    const list = document.getElementById('project-list');
     const alertSummary = document.getElementById('alert-summary');
     const alertList = document.getElementById('alert-list');
 
-    if (Object.keys(allWorkshops).length === 0) {
+    if (Object.keys(allProjects).length === 0) {
       list.innerHTML = `<div class="empty-state">
         <i class="fa-solid fa-box-open"></i>
-        <p>ワークショップがまだありません。<br>「新しいワークショップ」から作成してください。</p>
+        <p>企画がまだありません。<br>「新しい企画」から作成してください。</p>
       </div>`;
       alertSummary.style.display = 'none';
       return;
     }
 
-    // 在庫不足アイテム収集
     const alerts = [];
     let html = '';
 
-    for (const [wid, ws] of Object.entries(allWorkshops)) {
+    for (const [pid, proj] of Object.entries(allProjects)) {
       let lowCount = 0;
-      if (ws.parts) {
-        for (const p of Object.values(ws.parts)) {
+      if (proj.parts) {
+        for (const p of Object.values(proj.parts)) {
           if (p.stock < p.minStock) {
             lowCount++;
-            alerts.push({ wid, text: `${ws.name}：${p.name}（現在 ${p.stock}${p.unit}、最低 ${p.minStock}${p.unit}）` });
+            alerts.push({ pid, text: `${proj.name}：${p.name}（現在 ${p.stock}${p.unit}、最低 ${p.minStock}${p.unit}）` });
           }
         }
       }
-      const partCount = ws.parts ? Object.keys(ws.parts).length : 0;
-      html += `<div class="card workshop-card" onclick="showDetail('${wid}')">
+      const partCount = proj.parts ? Object.keys(proj.parts).length : 0;
+      const wsCount = Object.values(allWorkshops).filter(w => w.projectId === pid).length;
+      html += `<div class="card clickable-card" onclick="showProject('${pid}')">
         <div class="card-header">
           <div>
-            <div class="card-title">${esc(ws.name)}</div>
-            <div class="card-meta"><i class="fa-solid fa-location-dot"></i> ${esc(ws.location || '未設定')}　<i class="fa-solid fa-calendar"></i> ${ws.date || '未設定'}</div>
+            <div class="card-title">${esc(proj.name)}</div>
           </div>
           ${lowCount > 0 ? `<span class="badge badge-alert"><i class="fa-solid fa-triangle-exclamation"></i> 在庫不足 ${lowCount}件</span>` : `<span class="badge badge-ok"><i class="fa-solid fa-check"></i> 在庫OK</span>`}
         </div>
-        ${ws.description ? `<p style="font-size:13px;color:var(--text-muted);margin-top:8px;">${esc(ws.description)}</p>` : ''}
+        ${proj.description ? `<p style="font-size:13px;color:var(--text-muted);margin-top:8px;">${esc(proj.description)}</p>` : ''}
         <div class="card-footer">
           <span class="badge badge-info"><i class="fa-solid fa-boxes-stacked"></i> 部品 ${partCount}種</span>
+          <span class="badge badge-info"><i class="fa-solid fa-people-group"></i> ワークショップ ${wsCount}件</span>
           <span style="font-size:12px;color:var(--text-muted);">タップして詳細を見る <i class="fa-solid fa-chevron-right"></i></span>
         </div>
       </div>`;
@@ -871,130 +1027,225 @@
 
     list.innerHTML = html;
 
-    // アラート表示
     if (alerts.length > 0) {
       alertSummary.style.display = 'block';
-      alertList.innerHTML = alerts.map(a => `<li style="cursor:pointer;" onclick="showDetail('${a.wid}')">${esc(a.text)}</li>`).join('');
+      alertList.innerHTML = alerts.map(a => `<li style="cursor:pointer;" onclick="showProject('${a.pid}')">${esc(a.text)}</li>`).join('');
     } else {
       alertSummary.style.display = 'none';
     }
   }
 
-  // ── 詳細画面描画 ──
-  function renderDetail(wid) {
-    const ws = allWorkshops[wid];
-    if (!ws) return;
+  // ── 企画詳細描画 ──
+  function renderProject(pid) {
+    const proj = allProjects[pid];
+    if (!proj) return;
 
-    document.getElementById('detail-title').textContent = ws.name;
-    document.getElementById('detail-info').innerHTML = `
-      <div class="workshop-info-item tap-edit" onclick="openEditWorkshop()" title="タップして編集"><i class="fa-solid fa-location-dot"></i>${esc(ws.location || '未設定')}</div>
-      <div class="workshop-info-item tap-edit" onclick="openEditWorkshop()" title="タップして編集"><i class="fa-solid fa-calendar"></i>${ws.date || '未設定'}</div>
-      <div class="workshop-info-item tap-edit" onclick="openEditWorkshop()" title="タップして編集"><i class="fa-solid fa-note-sticky"></i>${ws.description ? esc(ws.description) : '説明なし'}</div>
+    document.getElementById('project-title').textContent = proj.name;
+    document.getElementById('project-info').innerHTML = `
+      <div class="info-item tap-edit" onclick="openEditProject()" title="タップして編集"><i class="fa-solid fa-note-sticky"></i>${proj.description ? esc(proj.description) : '説明なし'}</div>
     `;
 
     const container = document.getElementById('parts-container');
-    if (!ws.parts || Object.keys(ws.parts).length === 0) {
+    const parts = proj.parts || {};
+    if (Object.keys(parts).length === 0) {
       container.innerHTML = `<div class="empty-state">
         <i class="fa-solid fa-boxes-stacked"></i>
         <p>まだ部品がありません。「部品を追加」から登録してください。</p>
       </div>`;
+    } else {
+      let rows = '';
+      for (const [partId, p] of Object.entries(parts)) {
+        const isLow = p.stock < p.minStock;
+        rows += `<tr class="${isLow ? 'low-stock' : ''}">
+          <td><strong class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${esc(p.name)}</strong></td>
+          <td>
+            <div class="stock-control">
+              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',-1)" title="-1">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <input class="stock-input ${isLow ? 'low' : ''}" type="number"
+                value="${p.stock}"
+                onchange="setStock('${partId}',this.value)"
+                id="stock-input-${partId}" />
+              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',1)" title="+1">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </td>
+          <td class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${esc(p.unit)}</td>
+          <td class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${p.minStock}</td>
+          <td class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${p.perParticipant ?? 0}${esc(p.unit)}/人</td>
+          <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? `⚠ ${p.minStock - p.stock}個不足` : '✓ OK'}</span></td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deletePart('${partId}')" title="削除">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </td>
+        </tr>`;
+      }
+      container.innerHTML = `<table>
+        <thead>
+          <tr>
+            <th>部品名</th>
+            <th>在庫数</th>
+            <th>単位</th>
+            <th>最低在庫</th>
+            <th>1人あたり</th>
+            <th>状態</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+    }
+
+    const wsList = document.getElementById('project-workshop-list');
+    const workshops = Object.entries(allWorkshops).filter(([, w]) => w.projectId === pid);
+    if (workshops.length === 0) {
+      wsList.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-people-group"></i>
+        <p>まだワークショップがありません。「ワークショップを追加」から登録してください。</p>
+      </div>`;
       return;
     }
-
-    let rows = '';
-    for (const [pid, p] of Object.entries(ws.parts)) {
-      const isLow = p.stock < p.minStock;
-      rows += `<tr class="${isLow ? 'low-stock' : ''}" id="row-${pid}">
-        <td><strong class="tap-edit" onclick="openEditPart('${pid}')" title="タップして編集">${esc(p.name)}</strong></td>
-        <td>
-          <div class="stock-control">
-            <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${wid}','${pid}',-1)" title="-1">
-              <i class="fa-solid fa-minus"></i>
-            </button>
-            <input class="stock-input ${isLow ? 'low' : ''}" type="number" min="0"
-              value="${p.stock}"
-              onchange="setStock('${wid}','${pid}',this.value)"
-              id="stock-input-${pid}" />
-            <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${wid}','${pid}',1)" title="+1">
-              <i class="fa-solid fa-plus"></i>
-            </button>
+    let wsHtml = '';
+    for (const [wid, ws] of workshops) {
+      const past = isPast(ws);
+      wsHtml += `<div class="card clickable-card" onclick="showWorkshop('${wid}')">
+        <div class="card-header">
+          <div>
+            <div class="card-title">${esc(ws.name)}</div>
+            <div class="card-meta"><i class="fa-solid fa-location-dot"></i> ${esc(ws.location || '未設定')}　<i class="fa-solid fa-calendar"></i> ${ws.date || '未設定'}</div>
           </div>
-        </td>
-        <td class="tap-edit" onclick="openEditPart('${pid}')" title="タップして編集">${esc(p.unit)}</td>
-        <td class="tap-edit" onclick="openEditPart('${pid}')" title="タップして編集">${p.minStock}</td>
-        <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? `⚠ ${p.minStock - p.stock}個不足` : '✓ OK'}</span></td>
-        <td>
-          <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
-            <i class="fa-solid fa-trash"></i>
-          </button>
-        </td>
+          <span class="badge ${past ? 'badge-past' : 'badge-upcoming'}"><i class="fa-solid ${past ? 'fa-check' : 'fa-clock'}"></i> ${past ? '開催済み' : '開催予定'}</span>
+        </div>
+        <div class="card-footer">
+          <span class="badge badge-info"><i class="fa-solid fa-people-group"></i> 参加 ${ws.participants || 0}人</span>
+          <span style="font-size:12px;color:var(--text-muted);">タップして詳細を見る <i class="fa-solid fa-chevron-right"></i></span>
+        </div>
+      </div>`;
+    }
+    wsList.innerHTML = wsHtml;
+  }
+
+  // ── ワークショップ詳細描画 ──
+  function renderWorkshop(wid) {
+    const ws = allWorkshops[wid];
+    if (!ws) return;
+    const past = isPast(ws);
+
+    document.getElementById('workshop-title').textContent = ws.name;
+    document.getElementById('btn-delete-workshop').disabled = false;
+
+    document.getElementById('workshop-info').innerHTML = `
+      <div class="info-item ${past ? '' : 'tap-edit'}" ${past ? '' : `onclick="openEditWorkshop()" title="タップして編集"`}><i class="fa-solid fa-location-dot"></i>${esc(ws.location || '未設定')}</div>
+      <div class="info-item ${past ? '' : 'tap-edit'}" ${past ? '' : `onclick="openEditWorkshop()" title="タップして編集"`}><i class="fa-solid fa-calendar"></i>${ws.date || '未設定'}</div>
+      <div class="info-item ${past ? '' : 'tap-edit'}" ${past ? '' : `onclick="openEditWorkshop()" title="タップして編集"`}><i class="fa-solid fa-people-group"></i>参加 ${ws.participants || 0}人</div>
+      <div class="info-item ${past ? '' : 'tap-edit'}" ${past ? '' : `onclick="openEditWorkshop()" title="タップして編集"`}><i class="fa-solid fa-note-sticky"></i>${ws.description ? esc(ws.description) : '説明なし'}</div>
+      <span class="badge ${past ? 'badge-past' : 'badge-upcoming'}"><i class="fa-solid ${past ? 'fa-check' : 'fa-clock'}"></i> ${past ? '開催済み（割り振り確定）' : '開催予定'}</span>
+    `;
+
+    const container = document.getElementById('allocations-container');
+    const allocations = ws.allocations || {};
+    if (Object.keys(allocations).length === 0) {
+      container.innerHTML = `<div class="empty-state">
+        <i class="fa-solid fa-boxes-stacked"></i>
+        <p>割り振られた部品はありません。</p>
+      </div>`;
+      return;
+    }
+    let rows = '';
+    for (const a of Object.values(allocations)) {
+      rows += `<tr>
+        <td><strong>${esc(a.name)}</strong></td>
+        <td>${a.allocated}</td>
+        <td>${esc(a.unit)}</td>
       </tr>`;
     }
-
     container.innerHTML = `<table>
-      <thead>
-        <tr>
-          <th>部品名</th>
-          <th>在庫数</th>
-          <th>単位</th>
-          <th>最低在庫</th>
-          <th>状態</th>
-          <th>操作</th>
-        </tr>
-      </thead>
+      <thead><tr><th>部品名</th><th>割り振り数</th><th>単位</th></tr></thead>
       <tbody>${rows}</tbody>
     </table>`;
   }
 
-  // ── 在庫操作 ──
-  window.adjustStock = async (wid, pid, delta) => {
-    const current = allWorkshops[wid]?.parts?.[pid]?.stock ?? 0;
-    const next = Math.max(0, current + delta);
-    await update(ref(db, `workshops/${wid}/parts/${pid}`), { stock: next, updatedAt: Date.now() });
+  // ── 在庫操作（企画倉庫） ──
+  window.adjustStock = async (partId, delta) => {
+    const current = allProjects[currentProjectId]?.parts?.[partId]?.stock ?? 0;
+    await update(ref(db, `projects/${currentProjectId}/parts/${partId}`), { stock: current + delta, updatedAt: Date.now() });
   };
 
-  window.setStock = async (wid, pid, val) => {
-    const next = Math.max(0, parseInt(val) || 0);
-    await update(ref(db, `workshops/${wid}/parts/${pid}`), { stock: next, updatedAt: Date.now() });
+  window.setStock = async (partId, val) => {
+    const next = parseInt(val) || 0;
+    await update(ref(db, `projects/${currentProjectId}/parts/${partId}`), { stock: next, updatedAt: Date.now() });
   };
 
-  window.openEditPart = (pid) => {
-    const p = allWorkshops[currentWorkshopId]?.parts?.[pid];
+  window.openEditPart = (partId) => {
+    const p = allProjects[currentProjectId]?.parts?.[partId];
     if (!p) return;
-    currentEditPartId = pid;
+    currentEditPartId = partId;
     document.getElementById('edit-part-name').value = p.name || '';
     document.getElementById('edit-part-unit').value = p.unit || '';
     document.getElementById('edit-part-min-stock').value = p.minStock ?? 0;
+    document.getElementById('edit-part-per-participant').value = p.perParticipant ?? 0;
     openModal('modal-edit-part');
   };
 
-  window.deletePart = async (wid, pid) => {
+  window.deletePart = async (partId) => {
     if (!confirm('この部品を削除しますか？')) return;
-    await remove(ref(db, `workshops/${wid}/parts/${pid}`));
+    await remove(ref(db, `projects/${currentProjectId}/parts/${partId}`));
     showToast('部品を削除しました');
   };
 
+  // ── 開催日判定 ──
+  function isPast(ws) {
+    if (!ws.date) return false;
+    const todayStr = new Date().toISOString().slice(0, 10);
+    return ws.date < todayStr;
+  }
+
   // ── 画面遷移 ──
-  window.showDetail = (wid) => {
-    currentWorkshopId = wid;
-    document.getElementById('screen-dashboard').classList.remove('active');
-    document.getElementById('screen-detail').classList.add('active');
+  window.showProject = (pid) => {
+    currentProjectId = pid;
+    currentWorkshopId = null;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-project').classList.add('active');
     document.getElementById('btn-back').style.display = 'flex';
-    renderDetail(wid);
+    document.getElementById('header-title').textContent = allProjects[pid]?.name || '企画詳細';
+    renderProject(pid);
+  };
+
+  window.showWorkshop = (wid) => {
+    currentWorkshopId = wid;
+    const ws = allWorkshops[wid];
+    if (ws) currentProjectId = ws.projectId;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-workshop').classList.add('active');
+    document.getElementById('btn-back').style.display = 'flex';
+    document.getElementById('header-title').textContent = ws?.name || 'ワークショップ詳細';
+    renderWorkshop(wid);
   };
 
   function showDashboard() {
+    currentProjectId = null;
     currentWorkshopId = null;
-    document.getElementById('screen-detail').classList.remove('active');
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById('screen-dashboard').classList.add('active');
     document.getElementById('btn-back').style.display = 'none';
     document.getElementById('header-title').textContent = 'SEAds 在庫管理';
     renderDashboard();
   }
 
+  function handleBack() {
+    if (document.getElementById('screen-workshop').classList.contains('active')) {
+      showProject(currentProjectId);
+    } else {
+      showDashboard();
+    }
+  }
+
   // ── デモモード ──
   function renderDemoMode() {
-    document.getElementById('workshop-list').innerHTML = `<div class="card" style="border:2px dashed var(--accent);">
+    document.getElementById('project-list').innerHTML = `<div class="card" style="border:2px dashed var(--accent);">
       <p style="font-size:14px;color:var(--accent);font-weight:700;margin-bottom:8px;">
         <i class="fa-solid fa-info-circle"></i> デモモード（Firebase未接続）
       </p>
@@ -1010,7 +1261,7 @@
   // ── ユーティリティ ──
   function v(id) { return document.getElementById(id).value.trim(); }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function clearForm(ids) { ids.forEach(id => { document.getElementById(id).value = id.includes('stock') ? '0' : ''; }); }
+  function clearForm(ids) { ids.forEach(id => { document.getElementById(id).value = id.includes('stock') || id.includes('participant') ? '0' : ''; }); }
   function updateLastUpdated() {
     const el = document.getElementById('last-updated');
     el.textContent = `最終確認: ${new Date().toLocaleString('ja-JP')}`;
@@ -1020,7 +1271,10 @@
     document.getElementById('alert-summary').classList.toggle('collapsed');
   };
 
-  window.openModal = (id) => document.getElementById(id).classList.add('open');
+  window.openModal = (id) => {
+    if (id === 'modal-create-workshop') updateAllocationPreview();
+    document.getElementById(id).classList.add('open');
+  };
   window.closeModal = (id) => document.getElementById(id).classList.remove('open');
 
   // モーダルの外クリックで閉じる
