@@ -457,6 +457,9 @@
     <div class="section-header">
       <h2 id="detail-title">ワークショップ詳細</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn btn-secondary btn-sm" id="btn-edit-workshop">
+          <i class="fa-solid fa-pen"></i> 編集
+        </button>
         <button class="btn btn-secondary btn-sm" id="btn-duplicate">
           <i class="fa-solid fa-copy"></i> 複製
         </button>
@@ -509,6 +512,35 @@
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('modal-create-workshop')">キャンセル</button>
       <button class="btn btn-primary" id="btn-create-ws-submit"><i class="fa-solid fa-check"></i> 作成</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── モーダル: ワークショップ編集 ─── -->
+<div class="modal-overlay" id="modal-edit-workshop">
+  <div class="modal">
+    <h2><i class="fa-solid fa-pen" style="margin-right:8px;"></i>ワークショップを編集</h2>
+    <div class="form-group">
+      <label>ワークショップ名 *</label>
+      <input type="text" id="edit-ws-name" placeholder="例: 夏のものづくり教室" />
+    </div>
+    <div class="form-group">
+      <label>説明</label>
+      <textarea id="edit-ws-desc" rows="2" placeholder="内容の概要を入力"></textarea>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>開催日 *</label>
+        <input type="date" id="edit-ws-date" />
+      </div>
+      <div class="form-group">
+        <label>開催地 *</label>
+        <input type="text" id="edit-ws-location" placeholder="例: 横浜市立〇〇小学校" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-workshop')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-edit-ws-submit"><i class="fa-solid fa-check"></i> 保存</button>
     </div>
   </div>
 </div>
@@ -574,6 +606,31 @@
   </div>
 </div>
 
+<!-- ─── モーダル: 部品編集 ─── -->
+<div class="modal-overlay" id="modal-edit-part">
+  <div class="modal">
+    <h2><i class="fa-solid fa-pen" style="margin-right:8px;"></i>部品を編集</h2>
+    <div class="form-group">
+      <label>部品名 *</label>
+      <input type="text" id="edit-part-name" placeholder="例: PLA フィラメント（白）" />
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>単位 *</label>
+        <input type="text" id="edit-part-unit" placeholder="例: 個・m・g" />
+      </div>
+      <div class="form-group">
+        <label>最低在庫数</label>
+        <input type="number" id="edit-part-min-stock" min="0" />
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal('modal-edit-part')">キャンセル</button>
+      <button class="btn btn-primary" id="btn-edit-part-submit"><i class="fa-solid fa-check"></i> 保存</button>
+    </div>
+  </div>
+</div>
+
 <!-- トースト -->
 <div id="toast"></div>
 
@@ -592,6 +649,7 @@
   const firebaseConfig = window.FIREBASE_CONFIG ?? null;
 
   let currentWorkshopId = null;
+  let currentEditPartId = null;
   let allWorkshops = {};
   let db;
 
@@ -726,6 +784,41 @@
       openModal('modal-duplicate-workshop');
     };
 
+    // ワークショップ編集
+    document.getElementById('btn-edit-workshop').onclick = () => {
+      const src = allWorkshops[currentWorkshopId];
+      if (!src) return;
+      document.getElementById('edit-ws-name').value = src.name || '';
+      document.getElementById('edit-ws-desc').value = src.description || '';
+      document.getElementById('edit-ws-date').value = src.date || '';
+      document.getElementById('edit-ws-location').value = src.location || '';
+      openModal('modal-edit-workshop');
+    };
+    document.getElementById('btn-edit-ws-submit').onclick = async () => {
+      const name = v('edit-ws-name');
+      const location = v('edit-ws-location');
+      const date = v('edit-ws-date');
+      if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
+      await update(ref(db, `workshops/${currentWorkshopId}`), {
+        name, description: v('edit-ws-desc'), date, location
+      });
+      closeModal('modal-edit-workshop');
+      showToast('ワークショップを更新しました');
+    };
+
+    // 部品編集
+    document.getElementById('btn-edit-part-submit').onclick = async () => {
+      const name = v('edit-part-name');
+      const unit = v('edit-part-unit');
+      if (!name || !unit) { showToast('部品名と単位は必須です'); return; }
+      const minStock = parseInt(v('edit-part-min-stock')) || 0;
+      await update(ref(db, `workshops/${currentWorkshopId}/parts/${currentEditPartId}`), {
+        name, unit, minStock, updatedAt: Date.now()
+      });
+      closeModal('modal-edit-part');
+      showToast('部品を更新しました');
+    };
+
     renderDashboard();
   }
 
@@ -830,9 +923,14 @@
         <td>${p.minStock}</td>
         <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? `⚠ ${p.minStock - p.stock}個不足` : '✓ OK'}</span></td>
         <td>
-          <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
-            <i class="fa-solid fa-trash"></i>
-          </button>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-secondary btn-sm" onclick="openEditPart('${pid}')" title="編集">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         </td>
       </tr>`;
     }
@@ -862,6 +960,16 @@
   window.setStock = async (wid, pid, val) => {
     const next = Math.max(0, parseInt(val) || 0);
     await update(ref(db, `workshops/${wid}/parts/${pid}`), { stock: next, updatedAt: Date.now() });
+  };
+
+  window.openEditPart = (pid) => {
+    const p = allWorkshops[currentWorkshopId]?.parts?.[pid];
+    if (!p) return;
+    currentEditPartId = pid;
+    document.getElementById('edit-part-name').value = p.name || '';
+    document.getElementById('edit-part-unit').value = p.unit || '';
+    document.getElementById('edit-part-min-stock').value = p.minStock ?? 0;
+    openModal('modal-edit-part');
   };
 
   window.deletePart = async (wid, pid) => {
