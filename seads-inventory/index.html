@@ -250,6 +250,10 @@
     }
     .workshop-info-item i { font-size: 13px; opacity: 0.7; }
 
+    /* ─── タップ編集 ─── */
+    .tap-edit { cursor: pointer; border-bottom: 1px dashed transparent; transition: border-color 0.15s; }
+    .tap-edit:hover { border-bottom-color: currentColor; }
+
     /* ─── 部品テーブル ─── */
     .parts-table-wrap { overflow-x: auto; }
     table {
@@ -455,11 +459,8 @@
   <!-- ─── 画面B: ワークショップ詳細 ─── -->
   <div class="screen" id="screen-detail">
     <div class="section-header">
-      <h2 id="detail-title">ワークショップ詳細</h2>
+      <h2 id="detail-title" class="tap-edit" onclick="window.openEditWorkshop && window.openEditWorkshop()" title="タップして編集">ワークショップ詳細</h2>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn btn-secondary btn-sm" id="btn-edit-workshop">
-          <i class="fa-solid fa-pen"></i> 編集
-        </button>
         <button class="btn btn-secondary btn-sm" id="btn-duplicate">
           <i class="fa-solid fa-copy"></i> 複製
         </button>
@@ -785,7 +786,7 @@
     };
 
     // ワークショップ編集
-    document.getElementById('btn-edit-workshop').onclick = () => {
+    window.openEditWorkshop = () => {
       const src = allWorkshops[currentWorkshopId];
       if (!src) return;
       document.getElementById('edit-ws-name').value = src.name || '';
@@ -886,9 +887,9 @@
 
     document.getElementById('detail-title').textContent = ws.name;
     document.getElementById('detail-info').innerHTML = `
-      <div class="workshop-info-item"><i class="fa-solid fa-location-dot"></i>${esc(ws.location || '未設定')}</div>
-      <div class="workshop-info-item"><i class="fa-solid fa-calendar"></i>${ws.date || '未設定'}</div>
-      ${ws.description ? `<div class="workshop-info-item"><i class="fa-solid fa-note-sticky"></i>${esc(ws.description)}</div>` : ''}
+      <div class="workshop-info-item tap-edit" onclick="openEditWorkshop()" title="タップして編集"><i class="fa-solid fa-location-dot"></i>${esc(ws.location || '未設定')}</div>
+      <div class="workshop-info-item tap-edit" onclick="openEditWorkshop()" title="タップして編集"><i class="fa-solid fa-calendar"></i>${ws.date || '未設定'}</div>
+      <div class="workshop-info-item tap-edit" onclick="openEditWorkshop()" title="タップして編集"><i class="fa-solid fa-note-sticky"></i>${ws.description ? esc(ws.description) : '説明なし'}</div>
     `;
 
     const container = document.getElementById('parts-container');
@@ -904,7 +905,7 @@
     for (const [pid, p] of Object.entries(ws.parts)) {
       const isLow = p.stock < p.minStock;
       rows += `<tr class="${isLow ? 'low-stock' : ''}" id="row-${pid}">
-        <td><strong>${esc(p.name)}</strong></td>
+        <td><strong class="tap-edit" onclick="openEditPart('${pid}')" title="タップして編集">${esc(p.name)}</strong></td>
         <td>
           <div class="stock-control">
             <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${wid}','${pid}',-1)" title="-1">
@@ -919,18 +920,13 @@
             </button>
           </div>
         </td>
-        <td>${esc(p.unit)}</td>
-        <td>${p.minStock}</td>
+        <td class="tap-edit" onclick="openEditPart('${pid}')" title="タップして編集">${esc(p.unit)}</td>
+        <td class="tap-edit" onclick="openEditPart('${pid}')" title="タップして編集">${p.minStock}</td>
         <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? `⚠ ${p.minStock - p.stock}個不足` : '✓ OK'}</span></td>
         <td>
-          <div style="display:flex;gap:6px;">
-            <button class="btn btn-secondary btn-sm" onclick="openEditPart('${pid}')" title="編集">
-              <i class="fa-solid fa-pen"></i>
-            </button>
-            <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
+          <button class="btn btn-danger btn-sm" onclick="deletePart('${wid}','${pid}')" title="削除">
+            <i class="fa-solid fa-trash"></i>
+          </button>
         </td>
       </tr>`;
     }
