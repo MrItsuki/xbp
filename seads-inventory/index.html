@@ -306,6 +306,7 @@
     }
     .stock-input:focus { border-color: var(--primary); }
     .stock-input.low { border-color: var(--accent); color: var(--accent); }
+    .stock-control .btn-icon.btn-sm { font-size: 12px; font-weight: 700; width: auto; min-width: 36px; padding: 0 6px; }
 
     /* ─── 状態バッジ ─── */
     .status-badge {
@@ -676,7 +677,7 @@
       <label>参加人数 *</label>
       <input type="number" id="edit-ws-participants" min="0" />
     </div>
-    <p class="hint" style="margin-bottom:14px;">参加人数を変更すると、企画倉庫の在庫が自動で再計算されます。</p>
+    <p class="hint" style="margin-bottom:14px;">参加人数や日付を変更すると、全ワークショップの割り振りが自動で再計算されます。</p>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="closeModal('modal-edit-workshop')">キャンセル</button>
       <button class="btn btn-primary" id="btn-edit-ws-submit"><i class="fa-solid fa-check"></i> 保存</button>
@@ -853,36 +854,21 @@
       const participants = Math.max(0, parseInt(v('ws-participants')) || 0);
       if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
 
-      const project = allProjects[currentProjectId];
-      const parts = project.parts || {};
-      const allocations = {};
-      const updates = {};
-
-      for (const [pid, p] of Object.entries(parts)) {
-        const allocated = (p.perParticipant || 0) * participants;
-        allocations[pid] = { name: p.name, unit: p.unit, allocated };
-        updates[`projects/${currentProjectId}/parts/${pid}/stock`] = (p.stock || 0) - allocated;
-      }
-
-      const newWsRef = push(ref(db, 'workshops'));
-      updates[`workshops/${newWsRef.key}`] = {
-        projectId: currentProjectId, name, description: v('ws-desc'), date, location,
-        participants, createdAt: Date.now(),
-        allocations: Object.keys(allocations).length ? allocations : null
-      };
-
       try {
-        await update(ref(db), updates);
+        await push(ref(db, 'workshops'), {
+          projectId: currentProjectId, name, description: v('ws-desc'), date, location,
+          participants, createdAt: Date.now()
+        });
         closeModal('modal-create-workshop');
         clearForm(['ws-name', 'ws-desc', 'ws-date', 'ws-location']);
-        showToast('ワークショップを作成し、部品を割り振りました');
+        showToast('ワークショップを作成しました');
       } catch (e) {
         showToast('書き込みエラー: ' + e.message);
         console.error(e);
       }
     };
 
-    // ワークショップ編集（参加人数変更で在庫を再計算）
+    // ワークショップ編集
     window.openEditWorkshop = () => {
       const ws = allWorkshops[currentWorkshopId];
       if (!ws) return;
@@ -895,61 +881,26 @@
       openModal('modal-edit-workshop');
     };
     document.getElementById('btn-edit-ws-submit').onclick = async () => {
-      const ws = allWorkshops[currentWorkshopId];
       const name = v('edit-ws-name');
       const location = v('edit-ws-location');
       const date = v('edit-ws-date');
       const participants = Math.max(0, parseInt(v('edit-ws-participants')) || 0);
       if (!name || !location || !date) { showToast('名前・開催地・日付は必須です'); return; }
 
-      const project = allProjects[ws.projectId] || {};
-      const parts = project.parts || {};
-      const oldAllocations = ws.allocations || {};
-      const newAllocations = {};
-      const updates = {};
-
-      for (const [pid, p] of Object.entries(parts)) {
-        const newAllocated = (p.perParticipant || 0) * participants;
-        const oldAllocated = oldAllocations[pid]?.allocated || 0;
-        const delta = newAllocated - oldAllocated;
-        newAllocations[pid] = { name: p.name, unit: p.unit, allocated: newAllocated };
-        if (delta !== 0) {
-          updates[`projects/${ws.projectId}/parts/${pid}/stock`] = (p.stock || 0) - delta;
-        }
-      }
-
-      updates[`workshops/${currentWorkshopId}/name`] = name;
-      updates[`workshops/${currentWorkshopId}/description`] = v('edit-ws-desc');
-      updates[`workshops/${currentWorkshopId}/date`] = date;
-      updates[`workshops/${currentWorkshopId}/location`] = location;
-      updates[`workshops/${currentWorkshopId}/participants`] = participants;
-      updates[`workshops/${currentWorkshopId}/allocations`] = Object.keys(newAllocations).length ? newAllocations : null;
-
-      await update(ref(db), updates);
+      await update(ref(db, `workshops/${currentWorkshopId}`), {
+        name, description: v('edit-ws-desc'), date, location, participants
+      });
       closeModal('modal-edit-workshop');
-      showToast('ワークショップを更新し、在庫を再計算しました');
+      showToast('ワークショップを更新しました');
     };
 
-    // ワークショップ削除（開催日基準で在庫を返却するか判定）
+    // ワークショップ削除
     document.getElementById('btn-delete-workshop').onclick = async () => {
       const ws = allWorkshops[currentWorkshopId];
       if (!ws) return;
-      const past = isPast(ws);
-      const msg = past
-        ? 'このワークショップを削除しますか？開催日を過ぎているため、割り振り済みの部品は企画在庫に戻りません。'
-        : 'このワークショップを削除しますか？割り振られていた部品は企画在庫に戻ります。';
-      if (!confirm(msg)) return;
-
-      const updates = { [`workshops/${currentWorkshopId}`]: null };
-      if (!past && ws.allocations) {
-        const project = allProjects[ws.projectId];
-        for (const [pid, a] of Object.entries(ws.allocations)) {
-          const p = project?.parts?.[pid];
-          if (p) updates[`projects/${ws.projectId}/parts/${pid}/stock`] = (p.stock || 0) + (a.allocated || 0);
-        }
-      }
-      await update(ref(db), updates);
-      showToast(past ? 'ワークショップを削除しました' : 'ワークショップを削除し、在庫を戻しました');
+      if (!confirm('このワークショップを削除しますか？')) return;
+      await remove(ref(db, `workshops/${currentWorkshopId}`));
+      showToast('ワークショップを削除しました');
       showDashboard(true);
     };
 
@@ -962,7 +913,7 @@
     const parts = project?.parts || {};
     const preview = document.getElementById('ws-allocation-preview');
     const entries = Object.values(parts).map(p => `${esc(p.name)} ${(p.perParticipant || 0) * participants}${esc(p.unit)}`);
-    preview.textContent = entries.length ? `割り振り予定: ${entries.join('、')}` : '部品が登録されていません。';
+    preview.textContent = entries.length ? `必要部品: ${entries.join('、')}（在庫は日付が近い順に自動割り振り）` : '部品が登録されていません。';
   }
 
   function rerenderCurrentScreen() {
@@ -980,8 +931,9 @@
     const tabsEl = document.getElementById('project-tabs');
     let html = `<div class="tab-chip ${currentProjectId === null ? 'active' : ''}" onclick="selectProjectTab(null)">すべて</div>`;
     for (const [pid, proj] of Object.entries(allProjects)) {
-      const hasLow = proj.parts && Object.values(proj.parts).some(p => p.stock < p.minStock);
-      html += `<div class="tab-chip ${currentProjectId === pid ? 'active' : ''}" onclick="selectProjectTab('${pid}')">${hasLow ? '<span class="tab-chip-dot"></span>' : ''}${esc(proj.name)}</div>`;
+      const { byWorkshop } = computeProjectAllocation(pid);
+      const hasShortage = Object.values(byWorkshop).some(alloc => Object.values(alloc).some(a => a.shortage > 0));
+      html += `<div class="tab-chip ${currentProjectId === pid ? 'active' : ''}" onclick="selectProjectTab('${pid}')">${hasShortage ? '<span class="tab-chip-dot"></span>' : ''}${esc(proj.name)}</div>`;
     }
     html += `<div class="tab-chip tab-chip-add" onclick="openModal('modal-create-project')" title="新しい企画"><i class="fa-solid fa-plus"></i></div>`;
     tabsEl.innerHTML = html;
@@ -992,15 +944,48 @@
     renderDashboard();
   };
 
-  // ── ワークショップの部品不足を計算 ──
-  function computeShortage(ws) {
-    const project = allProjects[ws.projectId];
-    const allocations = ws.allocations || {};
+  // ── 割り振り計算エンジン ──
+  // 企画の現在在庫を、開催予定ワークショップへ日付が近い順に割り振る。
+  // 戻り値: {
+  //   byWorkshop: { wsId: { partId: { need, allocated, shortage } } },
+  //   remaining:  { partId: 割り振り後に残る在庫数 }
+  // }
+  function computeProjectAllocation(pid) {
+    const project = allProjects[pid];
+    const parts = project?.parts || {};
+    const remaining = {};
+    for (const [partId, p] of Object.entries(parts)) remaining[partId] = Math.max(0, p.stock || 0);
+
+    const upcoming = Object.entries(allWorkshops)
+      .filter(([, ws]) => ws.projectId === pid && !isPast(ws))
+      .sort((a, b) => (a[1].date || '').localeCompare(b[1].date || '') || a[1].createdAt - b[1].createdAt);
+
+    const byWorkshop = {};
+    for (const [wid, ws] of upcoming) {
+      const alloc = {};
+      const participants = ws.participants || 0;
+      for (const [partId, p] of Object.entries(parts)) {
+        const need = (p.perParticipant || 0) * participants;
+        const allocated = Math.min(need, Math.max(0, remaining[partId]));
+        alloc[partId] = { need, allocated, shortage: need - allocated };
+        remaining[partId] -= allocated;
+      }
+      byWorkshop[wid] = alloc;
+    }
+    return { byWorkshop, remaining };
+  }
+
+  // ワークショップ単体の不足リストを取得（開催済みは空）
+  function computeShortage(wid, ws) {
+    if (isPast(ws)) return [];
+    const { byWorkshop } = computeProjectAllocation(ws.projectId);
+    const alloc = byWorkshop[wid] || {};
+    const parts = allProjects[ws.projectId]?.parts || {};
     const shortages = [];
-    for (const [pid, a] of Object.entries(allocations)) {
-      const p = project?.parts?.[pid];
-      if (p && p.stock < p.minStock) {
-        shortages.push({ name: a.name, unit: a.unit, deficit: p.minStock - p.stock });
+    for (const [partId, a] of Object.entries(alloc)) {
+      if (a.shortage > 0) {
+        const p = parts[partId];
+        shortages.push({ name: p?.name || '', unit: p?.unit || '', deficit: a.shortage });
       }
     }
     return shortages;
@@ -1008,7 +993,7 @@
 
   function renderWorkshopCard(wid, ws) {
     const past = isPast(ws);
-    const shortages = computeShortage(ws);
+    const shortages = computeShortage(wid, ws);
     const projectName = allProjects[ws.projectId]?.name || '(企画削除済み)';
     return `<div class="card clickable-card" onclick="showWorkshop('${wid}')">
       <div class="card-header">
@@ -1093,29 +1078,40 @@
         <p>まだ部品がありません。「部品を追加」から登録してください。</p>
       </div>`;
     } else {
+      const { byWorkshop, remaining } = computeProjectAllocation(pid);
+      // 部品ごとの必要合計と不足合計を集計
+      const totals = {};
+      for (const alloc of Object.values(byWorkshop)) {
+        for (const [partId, a] of Object.entries(alloc)) {
+          if (!totals[partId]) totals[partId] = { need: 0, shortage: 0 };
+          totals[partId].need += a.need;
+          totals[partId].shortage += a.shortage;
+        }
+      }
+
       let rows = '';
       for (const [partId, p] of Object.entries(parts)) {
-        const isLow = p.stock < p.minStock;
-        rows += `<tr class="${isLow ? 'low-stock' : ''}">
-          <td><strong class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${esc(p.name)}</strong></td>
+        const t = totals[partId] || { need: 0, shortage: 0 };
+        const isShort = t.shortage > 0;
+        rows += `<tr class="${isShort ? 'low-stock' : ''}">
+          <td><strong class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${esc(p.name)}</strong><br>
+            <span style="font-size:12px;color:var(--text-muted);">${p.perParticipant ?? 0}${esc(p.unit)}/人・最低${p.minStock}${esc(p.unit)}</span>
+          </td>
           <td>
             <div class="stock-control">
-              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',-1)" title="-1">
-                <i class="fa-solid fa-minus"></i>
-              </button>
-              <input class="stock-input ${isLow ? 'low' : ''}" type="number"
-                value="${p.stock}"
-                onchange="setStock('${partId}',this.value)"
+              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',-10)" title="-10">-10</button>
+              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',-1)" title="-1"><i class="fa-solid fa-minus"></i></button>
+              <input class="stock-input ${isShort ? 'low' : ''}" type="number" min="0"
+                value="${Math.max(0, p.stock || 0)}"
                 id="stock-input-${partId}" />
-              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',1)" title="+1">
-                <i class="fa-solid fa-plus"></i>
-              </button>
+              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',1)" title="+1"><i class="fa-solid fa-plus"></i></button>
+              <button class="btn btn-secondary btn-icon btn-sm" onclick="adjustStock('${partId}',10)" title="+10">+10</button>
+              <button class="btn btn-primary btn-sm" onclick="applyStock('${partId}')" title="入力した数を保存して割り振り"><i class="fa-solid fa-check"></i> 反映</button>
             </div>
           </td>
-          <td class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${esc(p.unit)}</td>
-          <td class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${p.minStock}</td>
-          <td class="tap-edit" onclick="openEditPart('${partId}')" title="タップして編集">${p.perParticipant ?? 0}${esc(p.unit)}/人</td>
-          <td><span class="status-badge ${isLow ? 'status-low' : 'status-ok'}">${isLow ? `⚠ ${p.minStock - p.stock}個不足` : '✓ OK'}</span></td>
+          <td style="white-space:nowrap;">${t.need}${esc(p.unit)}</td>
+          <td style="white-space:nowrap;">${Math.max(0, remaining[partId] ?? 0)}${esc(p.unit)}</td>
+          <td><span class="status-badge ${isShort ? 'status-low' : 'status-ok'}">${isShort ? `⚠ ${t.shortage}${esc(p.unit)}不足` : '✓ 充足'}</span></td>
           <td>
             <button class="btn btn-danger btn-sm" onclick="deletePart('${partId}')" title="削除">
               <i class="fa-solid fa-trash"></i>
@@ -1128,15 +1124,17 @@
           <tr>
             <th>部品名</th>
             <th>在庫数</th>
-            <th>単位</th>
-            <th>最低在庫</th>
-            <th>1人あたり</th>
+            <th>予定必要数</th>
+            <th>割り振り後の残り</th>
             <th>状態</th>
             <th>操作</th>
           </tr>
         </thead>
         <tbody>${rows}</tbody>
-      </table>`;
+      </table>
+      <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+        <i class="fa-solid fa-circle-info"></i> 在庫数を変えて「反映」を押すと、開催日が近いワークショップから順に自動で割り振り直されます。
+      </p>`;
     }
   }
 
@@ -1158,37 +1156,73 @@
     `;
 
     const container = document.getElementById('allocations-container');
-    const allocations = ws.allocations || {};
-    if (Object.keys(allocations).length === 0) {
+    const parts = allProjects[ws.projectId]?.parts || {};
+
+    if (Object.keys(parts).length === 0) {
       container.innerHTML = `<div class="empty-state">
         <i class="fa-solid fa-boxes-stacked"></i>
-        <p>割り振られた部品はありません。</p>
+        <p>この企画にはまだ部品が登録されていません。</p>
       </div>`;
       return;
     }
+
+    if (past) {
+      // 開催済み: 必要だった数のみ表示
+      let rows = '';
+      for (const p of Object.values(parts)) {
+        const need = (p.perParticipant || 0) * (ws.participants || 0);
+        rows += `<tr>
+          <td><strong>${esc(p.name)}</strong></td>
+          <td>${need}${esc(p.unit)}</td>
+        </tr>`;
+      }
+      container.innerHTML = `<table>
+        <thead><tr><th>部品名</th><th>使用した数</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+      return;
+    }
+
+    const { byWorkshop } = computeProjectAllocation(ws.projectId);
+    const alloc = byWorkshop[wid] || {};
     let rows = '';
-    for (const a of Object.values(allocations)) {
-      rows += `<tr>
-        <td><strong>${esc(a.name)}</strong></td>
-        <td>${a.allocated}</td>
-        <td>${esc(a.unit)}</td>
+    for (const [partId, p] of Object.entries(parts)) {
+      const a = alloc[partId] || { need: 0, allocated: 0, shortage: 0 };
+      const isShort = a.shortage > 0;
+      rows += `<tr class="${isShort ? 'low-stock' : ''}">
+        <td><strong>${esc(p.name)}</strong></td>
+        <td>${a.need}${esc(p.unit)}</td>
+        <td>${a.allocated}${esc(p.unit)}</td>
+        <td><span class="status-badge ${isShort ? 'status-low' : 'status-ok'}">${isShort ? `⚠ ${a.shortage}${esc(p.unit)}不足` : '✓ 確保済み'}</span></td>
       </tr>`;
     }
     container.innerHTML = `<table>
-      <thead><tr><th>部品名</th><th>割り振り数</th><th>単位</th></tr></thead>
+      <thead><tr><th>部品名</th><th>必要数</th><th>確保できる数</th><th>状態</th></tr></thead>
       <tbody>${rows}</tbody>
-    </table>`;
+    </table>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:10px;">
+      <i class="fa-solid fa-circle-info"></i> 在庫は開催日が近いワークショップから順に割り振られます。
+    </p>`;
   }
 
   // ── 在庫操作（企画倉庫） ──
   window.adjustStock = async (partId, delta) => {
     const current = allProjects[currentProjectId]?.parts?.[partId]?.stock ?? 0;
-    await update(ref(db, `projects/${currentProjectId}/parts/${partId}`), { stock: current + delta, updatedAt: Date.now() });
+    const next = Math.max(0, current + delta);
+    await update(ref(db, `projects/${currentProjectId}/parts/${partId}`), { stock: next, updatedAt: Date.now() });
   };
 
   window.setStock = async (partId, val) => {
-    const next = parseInt(val) || 0;
+    const next = Math.max(0, parseInt(val) || 0);
     await update(ref(db, `projects/${currentProjectId}/parts/${partId}`), { stock: next, updatedAt: Date.now() });
+  };
+
+  // 入力欄の値を保存して割り振りを更新
+  window.applyStock = async (partId) => {
+    const input = document.getElementById(`stock-input-${partId}`);
+    const next = Math.max(0, parseInt(input.value) || 0);
+    await update(ref(db, `projects/${currentProjectId}/parts/${partId}`), { stock: next, updatedAt: Date.now() });
+    showToast('在庫を反映し、割り振りを更新しました');
   };
 
   window.openEditPart = (partId) => {
