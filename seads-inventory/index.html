@@ -6,7 +6,7 @@
   <title>SEAds 在庫管理システム</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,10 +31,28 @@
       --toast-bg: #333;
       --header-grad: linear-gradient(135deg, #0058A9 0%, #0074D9 100%);
       --spring: cubic-bezier(.34,1.56,.64,1);
+      --font-body: 'Noto Sans JP', sans-serif;
+      --font-display: 'Baloo 2', 'Noto Sans JP', sans-serif;
+    }
+
+    /* 見出しは Baloo 2（親しみやすい教育系フォント） */
+    header h1, .section-header h2, .card-title, .modal h2 {
+      font-family: var(--font-display);
+    }
+    /* 数値は等幅にして桁ズレを防ぐ */
+    .stock-input, .gauge-label, td, .badge {
+      font-variant-numeric: tabular-nums;
+    }
+    /* キーボード操作のフォーカスリング（マウス時は出さない） */
+    a:focus-visible, button:focus-visible, input:focus-visible,
+    textarea:focus-visible, [onclick]:focus-visible, .tab-chip:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 6px;
     }
 
     body {
-      font-family: 'Noto Sans JP', sans-serif;
+      font-family: var(--font-body);
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -407,9 +425,16 @@
     .empty-state i { font-size: 40px; color: var(--border); margin-bottom: 12px; display: block; }
     .empty-state p { font-size: 14px; line-height: 1.7; }
     .empty-emoji {
-      font-size: 52px;
-      display: block;
-      margin-bottom: 10px;
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: var(--primary);
+      background: var(--sub);
+      border-radius: 50%;
       animation: emojiBob 2.6s ease-in-out infinite;
     }
     @keyframes emojiBob {
@@ -1010,13 +1035,13 @@
   // ── 企画タブ描画 ──
   function renderProjectTabs() {
     const tabsEl = document.getElementById('project-tabs');
-    let html = `<div class="tab-chip ${currentProjectId === null ? 'active' : ''}" onclick="selectProjectTab(null)">すべて</div>`;
+    let html = `<div class="tab-chip ${currentProjectId === null ? 'active' : ''}" role="tab" tabindex="0" aria-selected="${currentProjectId === null}" onclick="selectProjectTab(null)">すべて</div>`;
     for (const [pid, proj] of Object.entries(allProjects)) {
       const { byWorkshop } = computeProjectAllocation(pid);
       const hasShortage = Object.values(byWorkshop).some(alloc => Object.values(alloc).some(a => a.shortage > 0));
-      html += `<div class="tab-chip ${currentProjectId === pid ? 'active' : ''}" onclick="selectProjectTab('${pid}')">${hasShortage ? '<span class="tab-chip-dot"></span>' : ''}${esc(proj.name)}</div>`;
+      html += `<div class="tab-chip ${currentProjectId === pid ? 'active' : ''}" role="tab" tabindex="0" aria-selected="${currentProjectId === pid}" onclick="selectProjectTab('${pid}')">${hasShortage ? `<span class="tab-chip-dot" title="在庫不足あり"></span>` : ''}${esc(proj.name)}</div>`;
     }
-    html += `<div class="tab-chip tab-chip-add" onclick="openModal('modal-create-project')" title="新しい企画"><i class="fa-solid fa-plus"></i></div>`;
+    html += `<div class="tab-chip tab-chip-add" role="button" tabindex="0" onclick="openModal('modal-create-project')" title="新しい企画" aria-label="新しい企画を追加"><i class="fa-solid fa-plus"></i></div>`;
     tabsEl.innerHTML = html;
   }
 
@@ -1091,7 +1116,7 @@
       }
     }
 
-    return `<div class="card clickable-card" style="--i:${index ?? 0}" onclick="showWorkshop('${wid}')">
+    return `<div class="card clickable-card" style="--i:${index ?? 0}" role="button" tabindex="0" onclick="showWorkshop('${wid}')">
       <div class="card-header">
         <div>
           <div class="card-title">${esc(ws.name)}</div>
@@ -1134,7 +1159,7 @@
 
     if (Object.keys(allProjects).length === 0) {
       listEl.innerHTML = `<div class="empty-state">
-        <span class="empty-emoji">🎨</span>
+        <div class="empty-emoji"><i class="fa-solid fa-palette"></i></div>
         <p>まだ企画がありません。<br>上のタブの「＋」から最初の企画を作ってみよう！</p>
       </div>`;
       return;
@@ -1144,7 +1169,7 @@
 
     if (entries.length === 0) {
       listEl.innerHTML = `<div class="empty-state">
-        <span class="empty-emoji">🛠️</span>
+        <div class="empty-emoji"><i class="fa-solid fa-screwdriver-wrench"></i></div>
         <p>${currentProjectId === null ? 'ワークショップはこれから！<br>企画タブを選んで最初の1件を追加しよう。' : 'この企画のワークショップはまだ0件。<br>「ワークショップを追加」から登録してみよう！'}</p>
       </div>`;
       return;
@@ -1171,7 +1196,7 @@
     const parts = proj.parts || {};
     if (Object.keys(parts).length === 0) {
       container.innerHTML = `<div class="empty-state">
-        <span class="empty-emoji">📦</span>
+        <div class="empty-emoji"><i class="fa-solid fa-box-open"></i></div>
         <p>部品箱はまだ空っぽ。<br>「部品を追加」から使う材料を登録しよう！</p>
       </div>`;
     } else {
@@ -1259,7 +1284,7 @@
 
     if (Object.keys(parts).length === 0) {
       container.innerHTML = `<div class="empty-state">
-        <span class="empty-emoji">📦</span>
+        <div class="empty-emoji"><i class="fa-solid fa-box-open"></i></div>
         <p>この企画にはまだ部品が登録されていません。<br>企画ページの「部品を追加」から登録すると、ここに自動で割り振られます。</p>
       </div>`;
       return;
@@ -1455,6 +1480,22 @@
   // モーダルの外クリックで閉じる
   document.querySelectorAll('.modal-overlay').forEach(el => {
     el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+  });
+
+  // キーボード操作: フォーカス中のカード/タブを Enter・Space で発火
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const el = document.activeElement;
+    if (el && (el.classList.contains('clickable-card') || el.classList.contains('tab-chip'))) {
+      e.preventDefault();
+      el.click();
+    }
+  });
+  // Escape で開いているモーダルを閉じる
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const open = document.querySelector('.modal-overlay.open');
+    if (open) open.classList.remove('open');
   });
 
   function showToast(msg) {
